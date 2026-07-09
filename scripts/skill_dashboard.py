@@ -19,6 +19,7 @@ from datetime import datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Iterable
+from urllib.parse import unquote
 
 
 SKILL_DIR = Path(__file__).resolve().parents[1]
@@ -255,7 +256,15 @@ CATEGORY_ORDER = [
     "其他",
 ]
 
-PLATFORM_ORDER = ["Codex", "Claude", "Hermes", "Other"]
+PLATFORM_ORDER = ["System", "Codex", "Claude", "Hermes", "Other"]
+
+PLATFORM_LABELS = {
+    "System": {"zh": "系统", "en": "System"},
+    "Codex": {"zh": "Codex", "en": "Codex"},
+    "Claude": {"zh": "Claude", "en": "Claude"},
+    "Hermes": {"zh": "Hermes", "en": "Hermes"},
+    "Other": {"zh": "其他", "en": "Other"},
+}
 
 SKIP_HEADINGS = {
     "overview",
@@ -363,7 +372,15 @@ def first_sentence(text: str, fallback: str) -> str:
     return (clean or fallback)[:220]
 
 
+def is_system_skill(path: Path) -> bool:
+    text = str(path)
+    home = str(Path.home())
+    return text.startswith(f"{home}/.codex/skills/.system")
+
+
 def infer_platforms(path: Path, name: str, description: str, body: str) -> list[str]:
+    if is_system_skill(path):
+        return ["System"]
     haystack = f"{path} {name} {description} {body[:3000]}".lower()
     platforms: list[str] = []
     if any(token in haystack for token in ("claude", "anthropic", ".claude")):
@@ -456,11 +473,134 @@ def capability_labels(name: str, description: str, sections: list[dict[str, str]
     return deduped
 
 
+def localized_category_list(categories: list[str], lang: str) -> str:
+    if not categories:
+        return "general workflow" if lang == "en" else "通用流程"
+    if lang == "en":
+        mapping = {
+            "文案": "copywriting",
+            "图片": "image work",
+            "视频": "video work",
+            "PPT": "slide decks",
+            "排版": "layout",
+            "数据": "data analysis",
+            "代码": "code work",
+            "知识库": "knowledge work",
+            "自动化": "automation",
+            "设计": "design",
+            "文档": "documents",
+            "音频": "audio",
+            "研究": "research",
+            "其他": "general workflow",
+        }
+        return ", ".join(mapping.get(item, item) for item in categories[:3])
+    return "、".join(categories[:3])
+
+
+def make_intro(display_name: str, platforms: list[str], categories: list[str], capabilities: list[str], source: str) -> dict[str, str]:
+    zh_categories = localized_category_list(categories, "zh")
+    en_categories = localized_category_list(categories, "en")
+    zh_caps = "、".join(capabilities[:3]) if capabilities else zh_categories
+    en_caps = ", ".join(capabilities[:3]) if capabilities else en_categories
+    zh_platform = " / ".join(PLATFORM_LABELS.get(item, {"zh": item})["zh"] for item in platforms)
+    en_platform = " / ".join(PLATFORM_LABELS.get(item, {"en": item})["en"] for item in platforms)
+    return {
+        "zh": f"{display_name} 是一个偏向「{zh_categories}」的本机 skill，适合在 {zh_platform} 场景下快速处理 {zh_caps} 等任务。它来自 {source}，可在详情页复制调用提示、查看变体入口，或在 localhost 模式下尝试真实生成示例。",
+        "en": f"{display_name} is a local skill focused on {en_categories}. Use it in {en_platform} workflows for tasks such as {en_caps}. It is sourced from {source}; the detail panel lets you copy invocation prompts, inspect variants, or try a real example in localhost mode.",
+    }
+
+
+def make_usage_cards(display_name: str, name: str, categories: list[str], capabilities: list[str]) -> list[dict[str, str]]:
+    zh_categories = localized_category_list(categories, "zh")
+    en_categories = localized_category_list(categories, "en")
+    zh_caps = "、".join(capabilities[:4]) if capabilities else zh_categories
+    en_caps = ", ".join(capabilities[:4]) if capabilities else en_categories
+    return [
+        {
+            "titleZh": "什么时候用",
+            "bodyZh": f"当任务需要 {zh_categories}，并且希望复用已经沉淀好的流程、提示或本地工具时，优先考虑 {display_name}。",
+            "titleEn": "When to use",
+            "bodyEn": f"Choose {display_name} when the task needs {en_categories} and you want a reusable local workflow instead of starting from scratch.",
+        },
+        {
+            "titleZh": "准备什么",
+            "bodyZh": f"先准备目标、输入材料和期望产出风格；如果任务涉及真实生成，请确认 token 额度、模型配置或本地软件可用。",
+            "titleEn": "What to prepare",
+            "bodyEn": "Prepare the goal, source material, and expected output style. For real generation, confirm token budget, model/provider setup, or local app availability first.",
+        },
+        {
+            "titleZh": "怎么调用",
+            "bodyZh": f"复制 `Use ${name}` 开头的提示，补充你要完成的具体任务；也可以直接复制下方变体提示，一键进入对应分支。",
+            "titleEn": "How to invoke",
+            "bodyEn": f"Copy a prompt starting with `Use ${name}`, add the concrete task, or use one of the variant prompts below for a specific branch.",
+        },
+        {
+            "titleZh": "产出预期",
+            "bodyZh": f"常见产出会围绕 {zh_caps} 展开。Dashboard 的真实案例按钮会尝试把结果写入本地示例目录。",
+            "titleEn": "Expected output",
+            "bodyEn": f"Expected output usually centers on {en_caps}. The real example action attempts to write artifacts into a local example folder.",
+        },
+    ]
+
+
+def variant_candidates(name: str, categories: list[str], capabilities: list[str], body: str) -> list[dict[str, str]]:
+    candidates: list[tuple[str, str, str]] = []
+    for category in categories[:4]:
+        candidates.append((category, category, f"Use ${name} to create a {category} example."))
+    for cap in capabilities[:5]:
+        if cap not in {item[0] for item in candidates}:
+            candidates.append((cap, cap, f"Use ${name} with the {cap} branch for a realistic task."))
+    style_keywords = [
+        ("科技感", "Tech style"),
+        ("国风", "Chinese style"),
+        ("极简", "Minimal style"),
+        ("复古", "Retro style"),
+        ("手绘", "Hand-drawn style"),
+        ("商业", "Business style"),
+        ("社媒", "Social style"),
+        ("小红书", "Xiaohongshu style"),
+        ("公众号", "WeChat article style"),
+        ("暗色", "Dark tone"),
+        ("亮色", "Bright tone"),
+    ]
+    lower_body = body.lower()
+    for zh, en in style_keywords:
+        if zh.lower() in lower_body and zh not in {item[0] for item in candidates}:
+            candidates.append((zh, en, f"Use ${name} with the {zh} variant for a realistic task."))
+    variants: list[dict[str, str]] = []
+    for index, (zh, en, prompt) in enumerate(candidates[:6], start=1):
+        variants.append(
+            {
+                "id": f"v{index}",
+                "labelZh": zh[:28],
+                "labelEn": en[:40],
+                "prompt": prompt,
+            }
+        )
+    if not variants:
+        variants.append(
+            {
+                "id": "v1",
+                "labelZh": "默认流程",
+                "labelEn": "Default workflow",
+                "prompt": f"Use ${name} to complete a realistic task.",
+            }
+        )
+    return variants
+
+
 def safe_relative(path: Path) -> str:
     try:
         return str(path.relative_to(Path.home()))
     except ValueError:
         return str(path)
+
+
+def path_uri(path: Path) -> str:
+    try:
+        return path.resolve().as_uri()
+    except (OSError, ValueError):
+        return ""
 
 
 def run_git(args: list[str], cwd: Path, timeout: int = 4) -> subprocess.CompletedProcess[str]:
@@ -510,6 +650,7 @@ def git_update_info(path: Path) -> dict[str, object]:
         "available": False,
         "label": "Git",
         "repoRoot": key,
+        "repoRootUri": path_uri(root),
         "branch": "",
         "upstream": "",
         "remote": "",
@@ -557,20 +698,29 @@ def scan_skill(skill_md: Path) -> dict[str, object] | None:
     identifier = hashlib.sha1(str(folder.resolve()).encode("utf-8")).hexdigest()[:12]
     summary = first_sentence(description, first_sentence(body, display_name))
     update_info = git_update_info(folder)
+    capabilities = capability_labels(name, description, sections, categories)
+    source = source_label(folder)
+    intro = make_intro(display_name, platforms, categories, capabilities, source)
     return {
         "id": identifier,
         "name": name,
         "displayName": display_name,
         "description": description,
         "summary": summary,
+        "intro": intro,
         "platforms": platforms,
         "categories": categories,
         "exampleKind": infer_example_kind(categories),
-        "capabilities": capability_labels(name, description, sections, categories),
+        "capabilities": capabilities,
+        "usageCards": make_usage_cards(display_name, name, categories, capabilities),
+        "variants": variant_candidates(name, categories, capabilities, plain_body),
         "sections": sections,
         "path": str(folder),
         "pathLabel": safe_relative(folder),
-        "source": source_label(folder),
+        "pathUri": path_uri(folder),
+        "sourceFile": str(skill_md),
+        "sourceFileUri": path_uri(skill_md),
+        "source": source,
         "update": update_info,
         "defaultPrompt": openai.get("default_prompt") or f"Use ${name} to handle this task.",
         "brandColor": openai.get("brand_color") or "",
@@ -660,11 +810,12 @@ def build_dataset(root_args: list[str] | None = None) -> dict[str, object]:
         "generatedAt": datetime.now().isoformat(timespec="seconds"),
         "skillCount": len(skills),
         "roots": [
-            {"path": str(root.path), "label": root.label, "exists": root.path.exists()} for root in roots
+            {"path": str(root.path), "pathUri": path_uri(root.path), "label": root.label, "exists": root.path.exists()} for root in roots
         ],
         "platformCounts": platform_counts,
         "categoryCounts": category_counts,
         "platformOrder": ["全部"] + PLATFORM_ORDER,
+        "platformLabels": PLATFORM_LABELS,
         "categoryOrder": ["全部"] + CATEGORY_ORDER,
         "dashboardUpdate": {
             "available": (SKILL_DIR / "scripts" / "update.sh").exists(),
@@ -791,6 +942,151 @@ def update_dashboard() -> dict[str, object]:
     return run_update_process(["bash", str(script)])
 
 
+def allowed_paths(dataset: dict[str, object], out_dir: Path) -> list[Path]:
+    paths = [out_dir, SKILL_DIR]
+    for root in dataset.get("roots", []):
+        if isinstance(root, dict) and root.get("path"):
+            paths.append(Path(str(root["path"])).expanduser())
+    for skill in dataset.get("skills", []):
+        if isinstance(skill, dict):
+            for key in ("path", "sourceFile"):
+                if skill.get(key):
+                    paths.append(Path(str(skill[key])).expanduser())
+            update = skill.get("update")
+            if isinstance(update, dict) and update.get("repoRoot"):
+                paths.append(Path(str(update["repoRoot"])).expanduser())
+    resolved: list[Path] = []
+    for path in paths:
+        try:
+            resolved.append(path.resolve())
+        except OSError:
+            continue
+    return resolved
+
+
+def is_allowed_local_path(path: Path, dataset: dict[str, object], out_dir: Path) -> bool:
+    try:
+        target = path.expanduser().resolve()
+    except OSError:
+        return False
+    for allowed in allowed_paths(dataset, out_dir):
+        if target == allowed or allowed in target.parents:
+            return True
+    return False
+
+
+def open_local_path(dataset: dict[str, object], out_dir: Path, raw_path: str) -> dict[str, object]:
+    if not raw_path:
+        return {"ok": False, "stderr": "Missing path.", "code": 400}
+    path = Path(unquote(raw_path)).expanduser()
+    if not path.exists():
+        return {"ok": False, "stderr": f"Path does not exist: {path}", "code": 404}
+    if not is_allowed_local_path(path, dataset, out_dir):
+        return {"ok": False, "stderr": "Path is outside the scanned skill roots.", "code": 403}
+    if sys.platform == "darwin":
+        args = ["open", str(path)]
+    elif os.name == "nt":
+        args = ["cmd", "/c", "start", "", str(path)]
+    else:
+        args = ["xdg-open", str(path)]
+    result = run_update_process(args, timeout=12)
+    result["path"] = str(path)
+    return result
+
+
+def safe_slug(value: str) -> str:
+    slug = re.sub(r"[^a-zA-Z0-9._-]+", "-", value.strip()).strip("-")
+    return slug[:72] or "skill"
+
+
+def find_variant(skill: dict[str, object], variant_id: str) -> dict[str, str] | None:
+    for variant in skill.get("variants", []):
+        if isinstance(variant, dict) and variant.get("id") == variant_id:
+            return {key: str(value) for key, value in variant.items()}
+    return None
+
+
+def build_real_example_prompt(skill: dict[str, object], variant: dict[str, str] | None, out_dir: Path) -> str:
+    name = str(skill.get("name", "skill"))
+    display_name = str(skill.get("displayName", name))
+    variant_label = variant.get("labelZh") if variant else "默认流程"
+    variant_prompt = variant.get("prompt") if variant else str(skill.get("defaultPrompt", f"Use ${name}."))
+    return f"""Use ${name} at {skill.get('path')} to generate a realistic example for Skill Dashboard.
+
+Skill: {display_name}
+Variant: {variant_label}
+Base prompt: {variant_prompt}
+
+Create the actual best-effort output files inside this folder:
+{out_dir}
+
+If the skill requires token budget, model/provider configuration, login, or a local app that is not currently available, do not fake the result. Write a concise NEXT_STEPS.md explaining exactly what is missing and what the user should configure.
+
+Return a short summary of what was generated and list the files created.
+"""
+
+
+def generate_real_example(dataset: dict[str, object], out_dir: Path, skill_id: str, variant_id: str = "") -> dict[str, object]:
+    skill = find_skill(dataset, skill_id)
+    if not skill:
+        return {"ok": False, "stderr": "Skill not found in the current dashboard scan.", "code": 404}
+    skill_path = Path(str(skill.get("path", ""))).expanduser()
+    if not skill_path.exists():
+        return {"ok": False, "stderr": f"Skill path does not exist: {skill_path}", "code": 404}
+    codex_bin = os.environ.get("SKILL_DASHBOARD_CODEX") or shutil_which("codex")
+    if not codex_bin:
+        command = f"codex exec --cd <output-dir> --add-dir {shlex.quote(str(skill_path))} \"Use ${skill.get('name')} ...\""
+        return {
+            "ok": False,
+            "needsConfig": True,
+            "stderr": "Codex CLI was not found. Install or configure codex, or set SKILL_DASHBOARD_CODEX.",
+            "command": command,
+            "code": 127,
+        }
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    example_dir = out_dir / "real-examples" / f"{timestamp}-{safe_slug(str(skill.get('name', 'skill')))}"
+    example_dir.mkdir(parents=True, exist_ok=True)
+    variant = find_variant(skill, variant_id)
+    prompt = build_real_example_prompt(skill, variant, example_dir)
+    prompt_path = example_dir / "REQUEST.md"
+    prompt_path.write_text(prompt, encoding="utf-8")
+    last_message = example_dir / "RESULT.md"
+    args = [
+        codex_bin,
+        "exec",
+        "--cd",
+        str(example_dir),
+        "--add-dir",
+        str(skill_path),
+        "--skip-git-repo-check",
+        "--output-last-message",
+        str(last_message),
+        prompt,
+    ]
+    result = run_update_process(args, timeout=int(os.environ.get("SKILL_DASHBOARD_EXAMPLE_TIMEOUT", "900")))
+    files = []
+    for item in sorted(example_dir.rglob("*")):
+        if item.is_file():
+            files.append({"path": str(item), "name": item.name, "pathUri": path_uri(item)})
+    result.update(
+        {
+            "outputPath": str(example_dir),
+            "outputUri": path_uri(example_dir),
+            "files": files[:80],
+            "summary": read_text(last_message, limit=4000) if last_message.exists() else "",
+        }
+    )
+    return result
+
+
+def shutil_which(command: str) -> str | None:
+    for directory in os.environ.get("PATH", "").split(os.pathsep):
+        candidate = Path(directory) / command
+        if candidate.exists() and os.access(candidate, os.X_OK):
+            return str(candidate)
+    return None
+
+
 def serve_directory(out_dir: Path, preferred_port: int, open_browser: bool, dataset: dict[str, object]) -> None:
     port = find_port(preferred_port)
     class Handler(SimpleHTTPRequestHandler):
@@ -827,6 +1123,21 @@ def serve_directory(out_dir: Path, preferred_port: int, open_browser: bool, data
                 return
             if self.path == "/api/update-dashboard":
                 result = update_dashboard()
+                self.send_json(200 if result.get("ok") else 400, result)
+                return
+            if self.path == "/api/open-path":
+                payload = self.read_json()
+                result = open_local_path(dataset, out_dir, str(payload.get("path", "")))
+                self.send_json(200 if result.get("ok") else 400, result)
+                return
+            if self.path == "/api/generate-real-example":
+                payload = self.read_json()
+                result = generate_real_example(
+                    dataset,
+                    out_dir,
+                    str(payload.get("id", "")),
+                    str(payload.get("variantId", "")),
+                )
                 self.send_json(200 if result.get("ok") else 400, result)
                 return
             self.send_json(404, {"ok": False, "stderr": "Unknown API endpoint."})

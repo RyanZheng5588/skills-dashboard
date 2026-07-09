@@ -94,6 +94,22 @@
       opacity: 0.72;
     }
 
+    .shell::before {
+      content: "";
+      position: fixed;
+      inset: 78px 0 auto;
+      height: 220px;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(96deg, transparent 0 14%, color-mix(in srgb, var(--accent-2) 18%, transparent) 30%, transparent 48%),
+        linear-gradient(84deg, transparent 18%, color-mix(in srgb, var(--accent) 16%, transparent) 55%, transparent 76%);
+      filter: blur(18px);
+      opacity: 0.82;
+      transform: skewY(-4deg);
+      animation: beamDrift 9s ease-in-out infinite alternate;
+    }
+
     button,
     input,
     select {
@@ -248,6 +264,12 @@
       background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent-2) 78%, var(--accent)));
       color: #071007;
       box-shadow: 0 16px 36px color-mix(in srgb, var(--accent) 16%, transparent);
+    }
+
+    .primary-btn:disabled,
+    .ghost-btn:disabled {
+      cursor: wait;
+      opacity: 0.66;
     }
 
     .seg-btn:hover,
@@ -409,6 +431,16 @@
         repeating-linear-gradient(90deg, transparent 0 31px, color-mix(in srgb, var(--accent-2) 8%, transparent) 31px 32px);
       opacity: 0.62;
       pointer-events: none;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
+      box-shadow: 0 0 30px color-mix(in srgb, var(--accent-2) 38%, transparent);
+      animation: railSweep 3.8s ease-in-out infinite;
     }
 
     .hero-copy {
@@ -758,6 +790,19 @@
       transition: opacity 220ms, transform 520ms ease;
     }
 
+    .skill-card::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: calc(var(--radius) - 1px);
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 34%),
+        linear-gradient(315deg, color-mix(in srgb, var(--accent-2) 10%, transparent), transparent 40%);
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
     .skill-card:hover {
       transform: translateY(-3px);
       border-color: color-mix(in srgb, var(--accent) 48%, transparent);
@@ -770,6 +815,10 @@
     .skill-card:hover::before {
       opacity: 1;
       transform: translateX(24%);
+    }
+
+    .skill-card:hover::after {
+      opacity: 1;
     }
 
     .card-top {
@@ -920,6 +969,8 @@
     .root-item {
       grid-template-columns: minmax(0, 1fr);
       overflow-wrap: anywhere;
+      text-align: left;
+      cursor: pointer;
     }
 
     .pagination {
@@ -1091,6 +1142,79 @@
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 14px;
+    }
+
+    .path-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      min-height: 34px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+      color: color-mix(in srgb, var(--accent-2) 64%, var(--text));
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+
+    .path-link:hover {
+      border-color: color-mix(in srgb, var(--accent-2) 54%, transparent);
+      background: color-mix(in srgb, var(--accent-2) 9%, transparent);
+    }
+
+    .variant-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .variant-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 46%),
+        var(--surface-soft);
+    }
+
+    .variant-card strong {
+      font-size: 13px;
+    }
+
+    .variant-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .real-files {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .footer-ip {
+      width: min(1320px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .footer-ip strong {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      color: var(--soft);
+      box-shadow: 0 0 34px color-mix(in srgb, var(--accent) 8%, transparent);
     }
 
     .example-empty {
@@ -1356,6 +1480,25 @@
       }
     }
 
+    @keyframes beamDrift {
+      to {
+        transform: translateY(18px) skewY(-4deg);
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes railSweep {
+      0%,
+      100% {
+        transform: translateX(-34%);
+        opacity: 0.35;
+      }
+      50% {
+        transform: translateX(34%);
+        opacity: 0.95;
+      }
+    }
+
     @keyframes markPulse {
       50% {
         transform: rotate(45deg) scale(1.14);
@@ -1415,6 +1558,7 @@
 
       .grid,
       .rail,
+      .variant-grid,
       .slide-grid,
       .timeline {
         grid-template-columns: 1fr;
@@ -1546,6 +1690,9 @@
         </aside>
       </div>
     </main>
+    <footer class="footer-ip">
+      <strong>再创辉煌AIGC</strong>
+    </footer>
   </div>
 
   <div id="drawerBackdrop" class="drawer-backdrop"></div>
@@ -1636,6 +1783,13 @@
         platformFilter: "平台",
         categoryFilter: "用途",
         copyPrompt: "复制调用",
+        copyVariant: "复制分支",
+        runVariant: "运行分支",
+        openFolder: "打开目录",
+        openSource: "打开源码",
+        copiedVariant: "分支调用已复制",
+        pathOpened: "已打开本地路径",
+        pathOpenFailed: "无法打开本地路径",
         updateInfo: "更新方式",
         updateAvailable: "可更新",
         updateUnavailable: "本地安装",
@@ -1643,6 +1797,7 @@
         copyUpdateCommand: "复制更新命令",
         updateCommand: "更新命令",
         gitRepo: "Git 仓库",
+        repoPath: "本地仓库",
         branch: "分支",
         upstream: "上游",
         updateConfirmTitle: "确认更新",
@@ -1658,20 +1813,29 @@
         purpose: "具体用途",
         location: "位置",
         usage: "详细使用说明",
+        intro: "中文介绍",
+        variants: "使用分支",
+        sourceAccess: "本地源码",
         usageFallbackTitle: "使用说明",
         usageFallbackBody: "暂无更详细说明。",
         example: "案例展示",
-        generate: "生成案例",
+        generate: "真实生成",
         regenerate: "重新生成",
+        localPreviewAction: "本地预览",
+        generateReal: "真实生成案例",
         noExample: "暂无案例",
-        localPreview: "{kind} 预览会在本地生成。",
+        localPreview: "点击真实生成会调用本机 Codex/配置好的 runner，产出文件会写入 dashboard 示例目录。",
         promptExample: "调用示例",
         outputPreview: "产出预览",
         generateTitle: "生成案例",
         cancel: "取消",
-        generateLocal: "生成本地案例",
-        tokenNotice: "本地预览不消耗 token。若要生成真实图片、视频、PPT 或长内容，需要先确认模型额度和相关配置。",
+        generateLocal: "生成本地预览",
+        tokenNotice: "真实生成可能消耗 token，并可能调用本机软件、Codex CLI 或模型服务。确认后会把示例写入本地 dashboard 目录。",
         localNotice: "本次会基于 SKILL.md 元数据生成本地案例，不联网，不消耗 token。",
+        realExampleDone: "真实案例已生成",
+        realExampleNeedsConfig: "需要先配置 Codex CLI 或 runner",
+        realExampleFailed: "真实生成失败",
+        realOutputPath: "输出目录",
         exampleGenerated: "案例已生成",
         examplesCleared: "案例已清空",
         promptCopied: "调用提示已复制",
@@ -1697,6 +1861,10 @@
         helpCopyPrompt: "复制这个 skill 的默认调用提示词。",
         helpClose: "关闭详情面板。",
         helpGenerate: "基于 SKILL.md 元数据生成本地案例预览，不会调用模型。",
+        helpGenerateReal: "调用本机 Codex CLI 真实运行这个 skill，可能消耗 token。",
+        helpLocalPreview: "只用本地元数据生成预览，不调用模型。",
+        helpOpenPath: "打开这个本地目录或文件。",
+        helpVariant: "复制这个分支的调用提示词。",
         featured: "Featured skill",
         visualDirection: "视觉方向",
         imageCandidate: "{cap}：生成 4 个候选方向",
@@ -1718,7 +1886,7 @@
         scannedAt: "Scanned {time}",
         heroEyebrow: "Local skill atlas",
         heroTitle: "Local Skill Atlas",
-        heroSubtitle: "Find the right skill by platform, use case, and real SKILL.md instructions.",
+        heroSubtitle: "Find the right skill by platform, use case, concise intros, branches, and real examples.",
         browseSkills: "Browse skills",
         searchAria: "Search skills",
         searchPlaceholder: "Search names, purpose, notes, paths",
@@ -1745,6 +1913,13 @@
         platformFilter: "Platform",
         categoryFilter: "Use case",
         copyPrompt: "Copy prompt",
+        copyVariant: "Copy branch",
+        runVariant: "Run branch",
+        openFolder: "Open folder",
+        openSource: "Open source",
+        copiedVariant: "Branch prompt copied",
+        pathOpened: "Local path opened",
+        pathOpenFailed: "Could not open local path",
         updateInfo: "Update",
         updateAvailable: "Updatable",
         updateUnavailable: "Local install",
@@ -1752,6 +1927,7 @@
         copyUpdateCommand: "Copy update command",
         updateCommand: "Update command",
         gitRepo: "Git repository",
+        repoPath: "Local repo",
         branch: "Branch",
         upstream: "Upstream",
         updateConfirmTitle: "Confirm Update",
@@ -1767,20 +1943,29 @@
         purpose: "Purpose",
         location: "Location",
         usage: "Usage Notes",
+        intro: "Introduction",
+        variants: "Branches",
+        sourceAccess: "Local Source",
         usageFallbackTitle: "Usage Notes",
         usageFallbackBody: "No deeper instructions were found.",
         example: "Example",
-        generate: "Generate",
+        generate: "Generate real",
         regenerate: "Regenerate",
+        localPreviewAction: "Local preview",
+        generateReal: "Generate real example",
         noExample: "No example yet",
-        localPreview: "A local {kind} preview will be generated.",
+        localPreview: "Real generation calls the local Codex CLI or configured runner and writes files into the dashboard example folder.",
         promptExample: "Prompt",
         outputPreview: "Output Preview",
         generateTitle: "Generate Example",
         cancel: "Cancel",
         generateLocal: "Generate local example",
-        tokenNotice: "Local previews do not consume tokens. For real images, videos, slide decks, or long model-authored examples, confirm token budget and provider configuration first.",
+        tokenNotice: "Real generation may consume tokens and may call local apps, Codex CLI, or model services. After confirmation, output files are written to the local dashboard folder.",
         localNotice: "This creates a local example from SKILL.md metadata. It does not use network access or tokens.",
+        realExampleDone: "Real example generated",
+        realExampleNeedsConfig: "Configure Codex CLI or a runner first",
+        realExampleFailed: "Real generation failed",
+        realOutputPath: "Output folder",
         exampleGenerated: "Example generated",
         examplesCleared: "Examples cleared",
         promptCopied: "Prompt copied",
@@ -1806,6 +1991,10 @@
         helpCopyPrompt: "Copy this skill's default invocation prompt.",
         helpClose: "Close the detail panel.",
         helpGenerate: "Generate a local preview from SKILL.md metadata. No model call is made.",
+        helpGenerateReal: "Run this skill through the local Codex CLI. This may consume tokens.",
+        helpLocalPreview: "Generate a metadata-only preview without model calls.",
+        helpOpenPath: "Open this local folder or file.",
+        helpVariant: "Copy this branch invocation prompt.",
         featured: "Featured skill",
         visualDirection: "visual direction",
         imageCandidate: "{cap}: generate 4 directions",
@@ -1833,6 +2022,7 @@
       perPage: 10,
       selectedId: null,
       pendingGenerateId: null,
+      pendingVariantId: "",
       pendingAction: null,
       pendingUpdateId: null,
       lang: localStorage.getItem(LANG_KEY) === "en" ? "en" : "zh",
@@ -1868,7 +2058,25 @@
     }
 
     function platformLabel(platform) {
-      return platform === ALL ? categoryLabel(ALL) : platform;
+      if (platform === ALL) return categoryLabel(ALL);
+      const labels = DATA.platformLabels && DATA.platformLabels[platform];
+      return (labels && labels[state.lang]) || platform;
+    }
+
+    function introText(skill) {
+      return (skill.intro && skill.intro[state.lang]) || skill.summary || skill.description || skill.displayName;
+    }
+
+    function usageTitle(card) {
+      return state.lang === "en" ? card.titleEn : card.titleZh;
+    }
+
+    function usageBody(card) {
+      return state.lang === "en" ? card.bodyEn : card.bodyZh;
+    }
+
+    function variantLabel(variant) {
+      return state.lang === "en" ? variant.labelEn : variant.labelZh;
     }
 
     function rootLabel(label) {
@@ -2048,7 +2256,7 @@
       $("#featuredPanel").innerHTML = `
         <small>${escapeHTML(t("featured"))}</small>
         <strong>${escapeHTML(preferred.displayName)}</strong>
-        <p>${escapeHTML(preferred.summary || preferred.description)}</p>
+        <p>${escapeHTML(introText(preferred))}</p>
       `;
     }
 
@@ -2088,10 +2296,10 @@
     function renderRoots() {
       const roots = (DATA.roots || []).filter((root) => root.exists).slice(0, 7);
       $("#rootList").innerHTML = roots.map((root) => `
-        <div class="root-item">
+        <button class="root-item" type="button" data-open-path="${escapeHTML(root.path)}" title="${escapeHTML(t("helpOpenPath"))}">
           <strong>${escapeHTML(rootLabel(root.label))}</strong>
           <span>${escapeHTML(root.path)}</span>
-        </div>
+        </button>
       `).join("");
     }
 
@@ -2131,7 +2339,7 @@
             <span>${escapeHTML(formatTime(skill.modified))}</span>
           </div>
           <h2 class="card-title">${escapeHTML(skill.displayName)}</h2>
-          <p class="card-desc">${escapeHTML(skill.summary || skill.description)}</p>
+          <p class="card-desc">${escapeHTML(introText(skill))}</p>
           <div class="tag-row">
             ${skill.platforms.slice(0, 2).map((tag) => `<span class="tag platform">${escapeHTML(tag)}</span>`).join("")}
             ${skill.categories.slice(0, 3).map((tag, i) => `<span class="tag ${i === 0 ? "hot" : ""}">${escapeHTML(categoryLabel(tag))}</span>`).join("")}
@@ -2170,7 +2378,7 @@
       if (!skill) return;
       state.selectedId = id;
       $("#drawerTitle").textContent = skill.displayName;
-      $("#drawerSubtitle").textContent = skill.description || skill.summary;
+      $("#drawerSubtitle").textContent = introText(skill);
       $("#drawerTags").innerHTML = [
         ...skill.platforms.map((tag) => `<span class="tag platform">${escapeHTML(tag)}</span>`),
         ...skill.categories.map((tag) => `<span class="tag hot">${escapeHTML(categoryLabel(tag))}</span>`),
@@ -2189,12 +2397,8 @@
     }
 
     function renderDetail(skill) {
-      const sections = (skill.sections || []).length ? skill.sections : [{
-        title: t("usageFallbackTitle"),
-        body: skill.bodyPreview || skill.description || t("usageFallbackBody"),
-      }];
       let example = examples[skill.id];
-      if (example && example.lang !== state.lang) {
+      if (example && example.kind !== "real" && example.lang !== state.lang) {
         example = buildExample(skill);
         examples[skill.id] = example;
         saveExamples();
@@ -2202,32 +2406,71 @@
       return `
         <div class="detail-grid">
           <section class="drawer-section">
+            <h3>${escapeHTML(t("intro"))}</h3>
+            <p>${escapeHTML(introText(skill))}</p>
+          </section>
+          <section class="drawer-section">
             <h3>${escapeHTML(t("purpose"))}</h3>
             <div class="tag-row">${skill.capabilities.map((item) => `<span class="tag">${escapeHTML(item)}</span>`).join("")}</div>
           </section>
+        </div>
+        <div class="detail-grid">
           <section class="drawer-section">
             <h3>${escapeHTML(t("location"))}</h3>
-            <p class="path-line">${escapeHTML(skill.path)}</p>
+            <button class="path-link path-line" type="button" data-open-path="${escapeHTML(skill.path)}">${escapeHTML(skill.path)}</button>
+          </section>
+          <section class="drawer-section">
+            <h3>${escapeHTML(t("sourceAccess"))}</h3>
+            <div class="update-actions">
+              <button class="ghost-btn" type="button" data-open-path="${escapeHTML(skill.path)}" data-help="${escapeHTML(t("helpOpenPath"))}">${escapeHTML(t("openFolder"))}</button>
+              <button class="ghost-btn" type="button" data-open-path="${escapeHTML(skill.sourceFile || skill.path)}" data-help="${escapeHTML(t("helpOpenPath"))}">${escapeHTML(t("openSource"))}</button>
+            </div>
           </section>
         </div>
         ${renderUpdateSection(skill)}
         <section class="drawer-section">
           <h3>${escapeHTML(t("usage"))}</h3>
           <div class="instruction-list">
-            ${sections.map((section) => `
+            ${(skill.usageCards || []).map((card) => `
               <div class="instruction-item">
-                <strong>${escapeHTML(section.title)}</strong>
-                <p>${escapeHTML(section.body)}</p>
+                <strong>${escapeHTML(usageTitle(card))}</strong>
+                <p>${escapeHTML(usageBody(card))}</p>
               </div>
             `).join("")}
           </div>
         </section>
+        ${renderVariants(skill)}
         <section class="drawer-section">
           <div class="example-head">
             <h3>${escapeHTML(t("example"))}</h3>
-            <button class="primary-btn" type="button" data-generate="${escapeHTML(skill.id)}" data-help="${escapeHTML(t("helpGenerate"))}">${escapeHTML(example ? t("regenerate") : t("generate"))}</button>
+            <div class="variant-actions">
+              <button class="primary-btn" type="button" data-generate="${escapeHTML(skill.id)}" data-help="${escapeHTML(t("helpGenerateReal"))}">${escapeHTML(example ? t("regenerate") : t("generate"))}</button>
+              <button class="ghost-btn" type="button" data-local-preview="${escapeHTML(skill.id)}" data-help="${escapeHTML(t("helpLocalPreview"))}">${escapeHTML(t("localPreviewAction"))}</button>
+            </div>
           </div>
           ${example ? renderExample(example) : renderExampleEmpty(skill)}
+        </section>
+      `;
+    }
+
+    function renderVariants(skill) {
+      const variants = skill.variants || [];
+      if (!variants.length) return "";
+      return `
+        <section class="drawer-section">
+          <h3>${escapeHTML(t("variants"))}</h3>
+          <div class="variant-grid">
+            ${variants.map((variant) => `
+              <div class="variant-card">
+                <strong>${escapeHTML(variantLabel(variant))}</strong>
+                <code class="code-preview">${escapeHTML(variant.prompt)}</code>
+                <div class="variant-actions">
+                  <button class="ghost-btn" type="button" data-copy-variant="${escapeHTML(skill.id)}" data-variant-id="${escapeHTML(variant.id)}" data-help="${escapeHTML(t("helpVariant"))}">${escapeHTML(t("copyVariant"))}</button>
+                  <button class="primary-btn" type="button" data-generate="${escapeHTML(skill.id)}" data-variant-id="${escapeHTML(variant.id)}" data-help="${escapeHTML(t("helpGenerateReal"))}">${escapeHTML(t("runVariant"))}</button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
         </section>
       `;
     }
@@ -2256,6 +2499,12 @@
               <strong>${escapeHTML(t("gitRepo"))}</strong>
               <p>${escapeHTML(update.remote || update.repoRoot || "")}</p>
             </div>
+            ${update.repoRoot ? `
+              <div class="instruction-item">
+                <strong>${escapeHTML(t("repoPath"))}</strong>
+                <button class="path-link path-line" type="button" data-open-path="${escapeHTML(update.repoRoot)}">${escapeHTML(update.repoRoot)}</button>
+              </div>
+            ` : ""}
             <div class="instruction-item">
               <strong>${escapeHTML(t("branch"))}</strong>
               <p>${escapeHTML([update.branch, update.upstream].filter(Boolean).join(" -> "))}</p>
@@ -2294,24 +2543,27 @@
           <div class="output-box">
             <strong>${escapeHTML(t("outputPreview"))}</strong>
             ${example.html}
+            ${example.outputPath ? `
+              <div class="real-files">
+                <strong>${escapeHTML(t("realOutputPath"))}</strong>
+                <button class="path-link path-line" type="button" data-open-path="${escapeHTML(example.outputPath)}">${escapeHTML(example.outputPath)}</button>
+              </div>
+            ` : ""}
           </div>
         </div>
       `;
     }
 
-    function requestGenerate(id) {
+    function requestGenerate(id, variantId = "") {
       const skill = skillById(id);
       if (!skill) return;
-      state.pendingAction = "generate";
+      state.pendingAction = "real-generate";
       state.pendingGenerateId = id;
-      $("#confirmText").textContent = needsTokenNotice(skill) ? t("tokenNotice") : t("localNotice");
+      state.pendingVariantId = variantId || "";
+      $("#confirmText").textContent = t("tokenNotice");
       $("#confirmTitle").textContent = t("generateTitle");
-      $("#confirmGenerateBtn").textContent = t("generateLocal");
+      $("#confirmGenerateBtn").textContent = t("generateReal");
       $("#confirmModal").classList.add("open");
-    }
-
-    function needsTokenNotice(skill) {
-      return ["图片", "视频", "PPT", "音频"].includes(skill.exampleKind);
     }
 
     function confirmGenerate() {
@@ -2322,6 +2574,39 @@
       $("#confirmModal").classList.remove("open");
       openDrawer(skill.id);
       showToast(t("exampleGenerated"));
+    }
+
+    function generateLocalPreview(id) {
+      const skill = skillById(id);
+      if (!skill) return;
+      examples[skill.id] = buildExample(skill);
+      saveExamples();
+      openDrawer(skill.id);
+      showToast(t("exampleGenerated"));
+    }
+
+    async function confirmRealGenerate() {
+      const skill = skillById(state.pendingGenerateId);
+      if (!skill) return;
+      if (!isLocalServiceMode()) {
+        await copyText(defaultPromptFor(skill, state.pendingVariantId), "updateApiUnavailable");
+        $("#confirmModal").classList.remove("open");
+        return;
+      }
+      await runUpdate(async () => {
+        const data = await postUpdate("/api/generate-real-example", { id: skill.id, variantId: state.pendingVariantId });
+        const prompt = defaultPromptFor(skill, state.pendingVariantId);
+        examples[skill.id] = {
+          kind: "real",
+          generatedAt: new Date().toISOString(),
+          prompt,
+          lang: state.lang,
+          outputPath: data.outputPath || "",
+          html: realExampleHtml(data),
+        };
+        saveExamples();
+        openDrawer(skill.id);
+      }, t("realExampleFailed"), t("realExampleDone"));
     }
 
     function requestUpdateSkill(id) {
@@ -2358,6 +2643,10 @@
         confirmGenerate();
         return;
       }
+      if (state.pendingAction === "real-generate") {
+        confirmRealGenerate();
+        return;
+      }
       if (state.pendingAction === "update-skill") {
         confirmUpdateSkill();
         return;
@@ -2390,7 +2679,7 @@
       await runUpdate(() => postUpdate("/api/update-dashboard"));
     }
 
-    async function runUpdate(task) {
+    async function runUpdate(task, failureLabel = null, successLabel = null) {
       const button = $("#confirmGenerateBtn");
       const previousText = button.textContent;
       button.disabled = true;
@@ -2398,10 +2687,10 @@
       try {
         await task();
         $("#confirmModal").classList.remove("open");
-        showToast(t("updateDone"));
+        showToast(successLabel || t("updateDone"));
       } catch (error) {
         const message = error && error.message ? String(error.message) : t("updateFailed");
-        showToast(`${t("updateFailed")}: ${message.slice(0, 120)}`);
+        showToast(`${failureLabel || t("updateFailed")}: ${message.slice(0, 120)}`);
       } finally {
         button.disabled = false;
         button.textContent = previousText;
@@ -2411,8 +2700,8 @@
     function buildExample(skill) {
       const title = skill.displayName;
       const caps = skill.capabilities.slice(0, 4);
-      const prompt = skill.defaultPrompt || `Use $${skill.name} to complete a realistic task.`;
-      const base = { generatedAt: new Date().toISOString(), prompt, lang: state.lang };
+      const prompt = defaultPromptFor(skill);
+      const base = { kind: "local", generatedAt: new Date().toISOString(), prompt, lang: state.lang };
       if (skill.exampleKind === "图片") return { ...base, html: imageExample(title, caps) };
       if (skill.exampleKind === "视频") return { ...base, html: videoExample(title, caps) };
       if (skill.exampleKind === "PPT") return { ...base, html: pptExample(title, caps) };
@@ -2423,6 +2712,29 @@
       if (skill.exampleKind === "文档") return { ...base, html: documentExample(title, caps) };
       if (skill.exampleKind === "文案") return { ...base, html: writingExample(title, caps) };
       return { ...base, html: workflowExample(title, caps) };
+    }
+
+    function defaultPromptFor(skill, variantId = "") {
+      const variant = (skill.variants || []).find((item) => item.id === variantId);
+      return (variant && variant.prompt) || skill.defaultPrompt || `Use $${skill.name} to complete a realistic task.`;
+    }
+
+    function realExampleHtml(data) {
+      const summary = data.summary || data.stdout || data.stderr || "";
+      const files = Array.isArray(data.files) ? data.files : [];
+      return `
+        <div class="prompt-box">
+          <strong>${escapeHTML(t("outputPreview"))}</strong>
+          <code>${escapeHTML(summary || t("realExampleDone"))}</code>
+        </div>
+        ${files.length ? `
+          <div class="real-files">
+            ${files.slice(0, 12).map((file) => `
+              <button class="path-link path-line" type="button" data-open-path="${escapeHTML(file.path)}">${escapeHTML(file.name || file.path)}</button>
+            `).join("")}
+          </div>
+        ` : ""}
+      `;
     }
 
     function imageExample(title, caps) {
@@ -2536,6 +2848,29 @@
       await copyText(text, successKey);
     }
 
+    async function copyVariantPrompt(id, variantId) {
+      const skill = skillById(id);
+      if (!skill) return;
+      await copyText(defaultPromptFor(skill, variantId), "copiedVariant");
+    }
+
+    async function openLocalPath(path) {
+      if (!path) return;
+      if (!isLocalServiceMode()) {
+        const skill = (DATA.skills || []).find((item) => item.path === path || item.sourceFile === path || (item.update && item.update.repoRoot === path));
+        const root = (DATA.roots || []).find((item) => item.path === path);
+        const uri = (skill && (skill.path === path ? skill.pathUri : skill.sourceFile === path ? skill.sourceFileUri : skill.update && skill.update.repoRoot === path ? skill.update.repoRootUri : "")) || (root && root.pathUri);
+        if (uri) window.open(uri, "_blank");
+        return;
+      }
+      try {
+        await postUpdate("/api/open-path", { path });
+        showToast(t("pathOpened"));
+      } catch (error) {
+        showToast(`${t("pathOpenFailed")}: ${String(error.message || error).slice(0, 120)}`);
+      }
+    }
+
     function formatTime(value) {
       if (!value) return "";
       const date = new Date(value);
@@ -2578,6 +2913,10 @@
         render();
         $("#resultsPanel").scrollIntoView({ behavior: "smooth", block: "start" });
       });
+      $("#rootList").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-open-path]");
+        if (button) openLocalPath(button.dataset.openPath);
+      });
       grid.addEventListener("click", (event) => {
         const card = event.target.closest("[data-id]");
         if (card) openDrawer(card.dataset.id);
@@ -2599,11 +2938,17 @@
       });
       $("#drawerBody").addEventListener("click", (event) => {
         const generateButton = event.target.closest("[data-generate]");
-        if (generateButton) requestGenerate(generateButton.dataset.generate);
+        if (generateButton) requestGenerate(generateButton.dataset.generate, generateButton.dataset.variantId || "");
+        const localPreviewButton = event.target.closest("[data-local-preview]");
+        if (localPreviewButton) generateLocalPreview(localPreviewButton.dataset.localPreview);
         const updateButton = event.target.closest("[data-update-skill]");
         if (updateButton) requestUpdateSkill(updateButton.dataset.updateSkill);
         const copyUpdateButton = event.target.closest("[data-copy-update]");
         if (copyUpdateButton) copyUpdateCommand(copyUpdateButton.dataset.copyUpdate);
+        const copyVariantButton = event.target.closest("[data-copy-variant]");
+        if (copyVariantButton) copyVariantPrompt(copyVariantButton.dataset.copyVariant, copyVariantButton.dataset.variantId);
+        const openPathButton = event.target.closest("[data-open-path]");
+        if (openPathButton) openLocalPath(openPathButton.dataset.openPath);
       });
       $("#closeDrawerBtn").addEventListener("click", closeDrawer);
       drawerBackdrop.addEventListener("click", closeDrawer);

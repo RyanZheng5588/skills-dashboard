@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square)
 ![License](https://img.shields.io/github/license/RyanZheng5588/skills-dashboard?style=flat-square)
 
-An installable skill for Codex, Claude Code, and local agent environments. It scans installed local skills and builds a self-contained browser dashboard for search, filtering, detail inspection, and local example previews.
+An installable skill for Codex, Claude Code, Hermes, and local agent environments. It scans installed local skills and builds a self-contained browser dashboard for search, filtering, path opening, branch prompt copying, detail inspection, and real example generation.
 
 It answers a practical question: "What skills do I have installed, what can they do, and when should I use each one?"
 
@@ -86,22 +86,34 @@ Add custom scan roots:
 python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --root ~/my-skills --open
 ```
 
+Real example generation requires localhost mode and a working Codex CLI. The dashboard looks for `codex` by default, or you can set:
+
+```bash
+SKILL_DASHBOARD_CODEX=/path/to/codex skill-dashboard
+```
+
+Real generation may consume tokens. The dashboard asks for confirmation and writes output into `.dashboard/real-examples/`.
+
 ## Features
 
 - Scans common local roots: Codex, Claude, Hermes, agent skills, and Codex plugin caches.
-- Browse by platform: Codex, Claude, Hermes, and Other.
+- Browse by platform: System, Codex, Claude, Hermes, and Other, with system skills separated from user skills.
 - Browse by use case: copy, images, video, slides, layout, data, code, knowledge, automation, design, docs, audio, research, and more.
-- Fuzzy search across skill names, descriptions, usage notes, categories, platforms, and paths.
+- Generates bilingual introductions for every skill; Chinese and English UI modes switch the intro text too.
+- Fuzzy search across skill names, descriptions, introductions, categories, platforms, paths, and git remotes.
+- Click local paths to open skill folders, source files, scan roots, and real example output folders.
+- Detects usage branches / style variants and supports one-click copying or running of variant prompts.
+- In localhost mode, can call Codex CLI to generate real examples; missing token, provider, or local-app setup is surfaced clearly.
 - Detects git-installed skills and supports click-to-update in localhost mode.
 - Card-based directory with pagination, ranking rail, and click-through detail drawer.
 - Bilingual UI: Chinese and English.
 - Theme switching: Orbit dark theme and Daylight light theme.
-- Local example previews that do not consume tokens or call external services.
+- Real example generation plus metadata-only local previews; real generation confirms token/configuration risk first.
 - Python standard library only for the dashboard builder.
 
 ## Good Fit / Poor Fit
 
-**Good fit**: local skill inventory, skill discovery, comparing Codex/Claude/Hermes skills, team demos, open-source skill repo audits.
+**Good fit**: local skill inventory, skill discovery, comparing System/Codex/Claude/Hermes skills, team demos, open-source skill repo audits.
 
 **Poor fit**: cloud-hosted multi-user management, remote skill marketplace sync, automatic third-party skill installation, or replacing the agent's own skill routing.
 

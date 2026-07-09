@@ -7,7 +7,7 @@
 
 > 🌏 English version: [README.en.md](./README.en.md)
 
-一个适配 Codex / Claude Code / 本地 Agent 环境的 skill，用来扫描本机已安装的 skills，并生成一个可搜索、可分类、可查看详情与案例预览的本地浏览器 dashboard。
+一个适配 Codex / Claude Code / Hermes / 本地 Agent 环境的 skill，用来扫描本机已安装的 skills，并生成一个可搜索、可分类、可打开路径、可复制分支调用、可真实生成案例的本地浏览器 dashboard。
 
 它解决的是「我到底装了哪些 skill、分别能干什么、应该什么时候用」这个问题。
 
@@ -95,22 +95,34 @@ SKILL_DASHBOARD_ROOTS="$HOME/work/skills:$HOME/.custom/skills" \
   python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --open
 ```
 
+真实生成案例需要以 localhost 模式启动，并且本机能运行 Codex CLI。默认会查找 `codex` 命令，也可以指定：
+
+```bash
+SKILL_DASHBOARD_CODEX=/path/to/codex skill-dashboard
+```
+
+真实生成可能消耗 token，Dashboard 会在运行前确认，并把输出写入 `.dashboard/real-examples/`。
+
 ## 功能
 
 - 扫描常见本地 skill 根目录：Codex、Claude、Hermes、agent skills 和 Codex plugin cache。
-- 按平台浏览：Codex、Claude、Hermes、Other。
+- 按平台浏览：System、Codex、Claude、Hermes、Other，其中系统级 skill 单独分组。
 - 按用途浏览：文案、图片、视频、PPT、排版、数据、代码、知识库、自动化、设计、文档、音频、研究等。
-- 支持对 skill 名称、描述、使用说明、分类、平台和路径进行模糊搜索。
+- 每个 skill 生成中英文介绍，中英文切换时介绍文案同步切换。
+- 支持对 skill 名称、描述、介绍、分类、平台、路径和 git remote 进行模糊搜索。
+- 所有展示的本地路径可点击打开，包括 skill 目录、源码文件、扫描来源和真实示例输出目录。
+- 支持识别 skill 的用途分支 / 风格变体，并一键复制或运行对应调用提示。
+- 支持 localhost 模式下调用 Codex CLI 真实生成案例；若缺 token、模型配置或本地软件，会明确提示。
 - 支持识别 git 安装的 skills，并在 localhost 模式下点击更新。
 - 卡片式目录、分页、右侧用途榜单、详情抽屉。
 - 中英文 UI 切换。
 - Orbit 暗色主题与 Daylight 浅色主题。
-- 本地案例预览，不消耗 token，不调用外部服务。
+- 真实生成案例和本地预览两种模式；真实生成会先提示 token 和配置风险。
 - 构建脚本只依赖 Python 标准库。
 
 ## 适合 / 不适合
 
-**适合**：整理本机 skills / 查看 skill 用途 / 对比 Codex、Claude、Hermes skill / 给团队演示本地 skill 能力 / 开源 skill 仓库自查。
+**适合**：整理本机 skills / 查看 skill 用途 / 对比 System、Codex、Claude、Hermes skill / 给团队演示本地 skill 能力 / 开源 skill 仓库自查。
 
 **不适合**：云端托管多用户管理 / 远程同步 skill 市场 / 自动安装第三方 skill / 替代 Codex 自身 skill 调度。
 
