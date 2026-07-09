@@ -1,0 +1,19 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# Local generated dashboard output. It may contain local skill names, paths, and screenshots.
+.dashboard/
+skill-dashboard/.dashboard/
+
+# Local editor and runtime state.
+.vscode/
+.idea/
+.env
+.env.*
+
+# Logs and temporary files.
+*.log
+tmp/
+dist/
+build/

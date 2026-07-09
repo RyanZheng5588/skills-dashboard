@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Dashboard"
+  short_description: "浏览搜索分类本机全部技能并按平台用途查看详情说明和案例预览"
+  default_prompt: "Use $skill-dashboard to open an interactive local dashboard for browsing installed skills."
