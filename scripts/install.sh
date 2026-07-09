@@ -25,7 +25,8 @@ else
 fi
 
 rm -rf "$DEST_DIR/.git" "$DEST_DIR/.dashboard" "$DEST_DIR"/scripts/__pycache__
-chmod +x "$DEST_DIR/scripts/start.sh" "$DEST_DIR/scripts/install.sh" "$DEST_DIR/scripts/check.sh" "$DEST_DIR/Skill Dashboard.command"
+chmod +x "$DEST_DIR/scripts/start.sh" "$DEST_DIR/scripts/install.sh" "$DEST_DIR/scripts/check.sh" "$DEST_DIR/scripts/update.sh"
+chmod +x "$DEST_DIR/Skill Dashboard.command" "$DEST_DIR/Skill Dashboard Update.command"
 
 BIN_DIR="$HOME/.local/bin"
 mkdir -p "$BIN_DIR"
@@ -35,10 +36,19 @@ exec "$DEST_DIR/scripts/start.sh" "\$@"
 EOF
 chmod +x "$BIN_DIR/skill-dashboard"
 
+cat > "$BIN_DIR/skill-dashboard-update" <<EOF
+#!/usr/bin/env bash
+exec "$DEST_DIR/scripts/update.sh" "\$@"
+EOF
+chmod +x "$BIN_DIR/skill-dashboard-update"
+
 echo "Installed skill-dashboard to $DEST_DIR"
 echo "One-click start on macOS: open \"$DEST_DIR/Skill Dashboard.command\""
+echo "One-click update on macOS: open \"$DEST_DIR/Skill Dashboard Update.command\""
 echo "Terminal start: skill-dashboard"
+echo "Terminal update: skill-dashboard-update"
 echo "Direct start: \"$DEST_DIR/scripts/start.sh\""
+echo "Direct update: \"$DEST_DIR/scripts/update.sh\""
 
 case ":$PATH:" in
   *":$BIN_DIR:"*) ;;

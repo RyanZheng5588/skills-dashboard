@@ -8,7 +8,9 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import socket
+import subprocess
 import sys
 import time
 import webbrowser
@@ -22,6 +24,8 @@ from typing import Iterable
 SKILL_DIR = Path(__file__).resolve().parents[1]
 ASSETS_DIR = SKILL_DIR / "assets"
 DEFAULT_OUT = SKILL_DIR / ".dashboard"
+DEFAULT_REPO_URL = "https://github.com/RyanZheng5588/skills-dashboard.git"
+GIT_INFO_CACHE: dict[str, dict[str, object]] = {}
 
 
 CATEGORY_RULES: dict[str, list[str]] = {
@@ -459,6 +463,82 @@ def safe_relative(path: Path) -> str:
         return str(path)
 
 
+def run_git(args: list[str], cwd: Path, timeout: int = 4) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(cwd), *args],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        check=False,
+    )
+
+
+def find_git_root(path: Path) -> Path | None:
+    try:
+        current = path.resolve()
+    except OSError:
+        current = path
+    if current.is_file():
+        current = current.parent
+    for candidate in [current, *current.parents]:
+        if (candidate / ".git").exists():
+            try:
+                result = run_git(["rev-parse", "--show-toplevel"], candidate)
+            except (OSError, subprocess.TimeoutExpired):
+                return candidate
+            if result.returncode == 0 and result.stdout.strip():
+                return Path(result.stdout.strip())
+            return candidate
+    return None
+
+
+def git_update_info(path: Path) -> dict[str, object]:
+    root = find_git_root(path)
+    if not root:
+        return {
+            "type": "local",
+            "available": False,
+            "label": "Local",
+            "note": "No git repository was detected for this skill.",
+            "command": "",
+        }
+    key = str(root)
+    if key in GIT_INFO_CACHE:
+        return dict(GIT_INFO_CACHE[key])
+    info: dict[str, object] = {
+        "type": "git",
+        "available": False,
+        "label": "Git",
+        "repoRoot": key,
+        "branch": "",
+        "upstream": "",
+        "remote": "",
+        "dirty": False,
+        "command": f"git -C {shlex.quote(key)} pull --ff-only",
+    }
+    try:
+        branch = run_git(["rev-parse", "--abbrev-ref", "HEAD"], root)
+        upstream = run_git(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"], root)
+        remote = run_git(["remote", "get-url", "origin"], root)
+        status = run_git(["status", "--porcelain"], root)
+    except (OSError, subprocess.TimeoutExpired):
+        info["note"] = "Git metadata could not be read."
+        GIT_INFO_CACHE[key] = info
+        return dict(info)
+    if branch.returncode == 0:
+        info["branch"] = branch.stdout.strip()
+    if upstream.returncode == 0:
+        info["upstream"] = upstream.stdout.strip()
+        info["available"] = True
+    if remote.returncode == 0:
+        info["remote"] = remote.stdout.strip()
+    if status.returncode == 0:
+        info["dirty"] = bool(status.stdout.strip())
+    info["note"] = "Pull with --ff-only from the configured upstream." if info["available"] else "Git repo found, but no upstream branch is configured."
+    GIT_INFO_CACHE[key] = info
+    return dict(info)
+
+
 def scan_skill(skill_md: Path) -> dict[str, object] | None:
     raw = read_text(skill_md)
     if not raw:
@@ -476,6 +556,7 @@ def scan_skill(skill_md: Path) -> dict[str, object] | None:
     stat = skill_md.stat()
     identifier = hashlib.sha1(str(folder.resolve()).encode("utf-8")).hexdigest()[:12]
     summary = first_sentence(description, first_sentence(body, display_name))
+    update_info = git_update_info(folder)
     return {
         "id": identifier,
         "name": name,
@@ -490,12 +571,13 @@ def scan_skill(skill_md: Path) -> dict[str, object] | None:
         "path": str(folder),
         "pathLabel": safe_relative(folder),
         "source": source_label(folder),
+        "update": update_info,
         "defaultPrompt": openai.get("default_prompt") or f"Use ${name} to handle this task.",
         "brandColor": openai.get("brand_color") or "",
         "bodyPreview": plain_body[:1800],
-        "searchText": normalize_spaces(f"{name} {display_name} {description} {' '.join(categories)} {' '.join(platforms)} {plain_body}")[
-            :7000
-        ],
+        "searchText": normalize_spaces(
+            f"{name} {display_name} {description} {' '.join(categories)} {' '.join(platforms)} {update_info.get('remote', '')} {plain_body}"
+        )[:7000],
         "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(timespec="seconds"),
         "size": stat.st_size,
     }
@@ -584,6 +666,13 @@ def build_dataset(root_args: list[str] | None = None) -> dict[str, object]:
         "categoryCounts": category_counts,
         "platformOrder": ["全部"] + PLATFORM_ORDER,
         "categoryOrder": ["全部"] + CATEGORY_ORDER,
+        "dashboardUpdate": {
+            "available": (SKILL_DIR / "scripts" / "update.sh").exists(),
+            "command": shlex.quote(str(SKILL_DIR / "scripts" / "update.sh")),
+            "script": str(SKILL_DIR / "scripts" / "update.sh"),
+            "repoUrl": DEFAULT_REPO_URL,
+            "repo": git_update_info(SKILL_DIR),
+        },
         "skills": skills,
         "referenceSources": [
             {
@@ -639,7 +728,70 @@ def find_port(preferred: int) -> int:
     raise RuntimeError(f"No free port found near {preferred}")
 
 
-def serve_directory(out_dir: Path, preferred_port: int, open_browser: bool) -> None:
+def trim_output(text: str | bytes, limit: int = 6000) -> str:
+    if isinstance(text, bytes):
+        text = text.decode("utf-8", errors="replace")
+    if len(text) <= limit:
+        return text
+    return text[:limit] + "\n...[truncated]"
+
+
+def run_update_process(args: list[str], timeout: int = 180) -> dict[str, object]:
+    command = " ".join(shlex.quote(part) for part in args)
+    try:
+        proc = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+    except FileNotFoundError as exc:
+        return {"ok": False, "command": command, "stdout": "", "stderr": str(exc), "code": 127}
+    except subprocess.TimeoutExpired as exc:
+        return {
+            "ok": False,
+            "command": command,
+            "stdout": trim_output(exc.stdout or ""),
+            "stderr": trim_output(exc.stderr or "Update timed out."),
+            "code": 124,
+        }
+    return {
+        "ok": proc.returncode == 0,
+        "command": command,
+        "stdout": trim_output(proc.stdout),
+        "stderr": trim_output(proc.stderr),
+        "code": proc.returncode,
+    }
+
+
+def find_skill(dataset: dict[str, object], skill_id: str) -> dict[str, object] | None:
+    for skill in dataset.get("skills", []):
+        if isinstance(skill, dict) and skill.get("id") == skill_id:
+            return skill
+    return None
+
+
+def update_skill(dataset: dict[str, object], skill_id: str) -> dict[str, object]:
+    skill = find_skill(dataset, skill_id)
+    if not skill:
+        return {"ok": False, "stderr": "Skill not found in the current dashboard scan.", "code": 404}
+    update = skill.get("update")
+    if not isinstance(update, dict) or not update.get("available"):
+        return {
+            "ok": False,
+            "stderr": "This skill is not connected to a git upstream, so it cannot be updated automatically.",
+            "code": 400,
+            "command": update.get("command", "") if isinstance(update, dict) else "",
+        }
+    repo_root = Path(str(update.get("repoRoot", ""))).expanduser()
+    if not repo_root.exists():
+        return {"ok": False, "stderr": f"Repository path does not exist: {repo_root}", "code": 404}
+    return run_update_process(["git", "-C", str(repo_root), "pull", "--ff-only"])
+
+
+def update_dashboard() -> dict[str, object]:
+    script = SKILL_DIR / "scripts" / "update.sh"
+    if not script.exists():
+        return {"ok": False, "stderr": f"Update script is missing: {script}", "code": 404}
+    return run_update_process(["bash", str(script)])
+
+
+def serve_directory(out_dir: Path, preferred_port: int, open_browser: bool, dataset: dict[str, object]) -> None:
     port = find_port(preferred_port)
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args: object, **kwargs: object) -> None:
@@ -647,6 +799,37 @@ def serve_directory(out_dir: Path, preferred_port: int, open_browser: bool) -> N
 
         def log_message(self, fmt: str, *args: object) -> None:
             sys.stderr.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), fmt % args))
+
+        def send_json(self, status: int, payload: dict[str, object]) -> None:
+            body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def read_json(self) -> dict[str, object]:
+            length = int(self.headers.get("Content-Length", "0") or 0)
+            if length <= 0:
+                return {}
+            raw = self.rfile.read(min(length, 65536))
+            try:
+                value = json.loads(raw.decode("utf-8"))
+            except json.JSONDecodeError:
+                return {}
+            return value if isinstance(value, dict) else {}
+
+        def do_POST(self) -> None:
+            if self.path == "/api/update-skill":
+                payload = self.read_json()
+                result = update_skill(dataset, str(payload.get("id", "")))
+                self.send_json(200 if result.get("ok") else 400, result)
+                return
+            if self.path == "/api/update-dashboard":
+                result = update_dashboard()
+                self.send_json(200 if result.get("ok") else 400, result)
+                return
+            self.send_json(404, {"ok": False, "stderr": "Unknown API endpoint."})
 
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     url = f"http://127.0.0.1:{port}/index.html"
@@ -684,7 +867,7 @@ def main() -> int:
     if args.open and not args.serve:
         webbrowser.open(index_path.as_uri())
     if args.serve:
-        serve_directory(out_dir, args.port, args.open)
+        serve_directory(out_dir, args.port, args.open, dataset)
     return 0
 
 

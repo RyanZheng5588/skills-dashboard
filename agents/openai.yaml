@@ -1,8 +1,8 @@
 interface:
   display_name: "Skill Dashboard"
-  short_description: "浏览搜索分类本机全部技能并按平台用途查看详情说明和案例预览"
+  short_description: "浏览搜索分类本机全部技能，查看详情案例并支持更新管理"
   brand_color: "#B9FF46"
-  default_prompt: "Use $skill-dashboard to open an interactive local dashboard for browsing installed skills."
+  default_prompt: "Use $skill-dashboard to open the local skills dashboard and help me browse, inspect, and update installed skills."
 
 policy:
   allow_implicit_invocation: true

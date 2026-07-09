@@ -852,6 +852,12 @@
       color: color-mix(in srgb, var(--accent-4) 70%, var(--text));
     }
 
+    .tag.update {
+      border-color: color-mix(in srgb, var(--accent) 46%, transparent);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: color-mix(in srgb, var(--accent) 74%, var(--text));
+    }
+
     .rail {
       display: grid;
       gap: 14px;
@@ -1078,6 +1084,13 @@
     .example-head h3 {
       margin: 0;
       font-size: 14px;
+    }
+
+    .update-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
     }
 
     .example-empty {
@@ -1387,7 +1400,9 @@
 
       .top-actions {
         justify-content: flex-start;
-        overflow-x: auto;
+        flex-wrap: wrap;
+        overflow: visible;
+        width: 100%;
       }
 
       .hero {
@@ -1453,6 +1468,7 @@
           <button id="langEnBtn" class="seg-btn" type="button" data-lang="en">EN</button>
         </div>
         <button id="themeBtn" class="ghost-btn" type="button" data-help="">Orbit</button>
+        <button id="updateDashboardBtn" class="ghost-btn" type="button" data-help="">更新</button>
         <button id="refreshBtn" class="ghost-btn" type="button" data-help="">刷新</button>
         <button id="clearExamplesBtn" class="ghost-btn" type="button" data-help="">清空案例</button>
       </div>
@@ -1598,6 +1614,7 @@
         searchAria: "搜索 skill",
         searchPlaceholder: "搜索名称、用途、说明、路径",
         refresh: "刷新",
+        updateDashboard: "更新",
         clearExamples: "清空案例",
         skills: "Skills",
         examples: "Examples",
@@ -1619,6 +1636,24 @@
         platformFilter: "平台",
         categoryFilter: "用途",
         copyPrompt: "复制调用",
+        updateInfo: "更新方式",
+        updateAvailable: "可更新",
+        updateUnavailable: "本地安装",
+        updateSkill: "更新 skill",
+        copyUpdateCommand: "复制更新命令",
+        updateCommand: "更新命令",
+        gitRepo: "Git 仓库",
+        branch: "分支",
+        upstream: "上游",
+        updateConfirmTitle: "确认更新",
+        updateConfirmSkill: "将对「{name}」执行 git pull --ff-only。若有本地未提交修改，Git 会阻止覆盖。",
+        updateConfirmDashboard: "将更新 Skill Dashboard 自身。更新完成后请刷新页面或重新启动 dashboard。",
+        updateDone: "更新完成",
+        updateFailed: "更新失败",
+        updateCopied: "更新命令已复制",
+        updateApiUnavailable: "当前不是 localhost 服务模式，已改为复制更新命令",
+        updateManualNote: "这个 skill 不是 git 上游安装，无法自动更新。请按它的来源重新安装或手动替换文件。",
+        updating: "更新中…",
         close: "关闭",
         purpose: "具体用途",
         location: "位置",
@@ -1645,6 +1680,7 @@
         themeDaylight: "Daylight",
         helpLanguage: "切换界面语言。Skill 原文保持原样，不会自动翻译。",
         helpTheme: "切换深色 Orbit 与浅色 Daylight 主题。",
+        helpUpdateDashboard: "更新 skill-dashboard 自身。需要 localhost 服务模式和 git。",
         helpRefresh: "重新载入当前 dashboard。若本机 skill 变了，请重新启动生成器。",
         helpClearExamples: "清空浏览器本地保存的案例预览，不会删除任何 skill 文件。",
         helpSearch: "模糊搜索 skill 名称、描述、用途、平台和路径。",
@@ -1656,6 +1692,8 @@
         helpSort: "调整当前结果的排序方式。",
         helpRank: "点击后筛选这个用途分类。",
         helpCard: "点击打开详情、使用说明和案例预览。",
+        helpUpdateSkill: "在本机对这个 git 安装的 skill 执行安全更新。",
+        helpCopyUpdate: "复制更新命令，适合在终端里手动执行。",
         helpCopyPrompt: "复制这个 skill 的默认调用提示词。",
         helpClose: "关闭详情面板。",
         helpGenerate: "基于 SKILL.md 元数据生成本地案例预览，不会调用模型。",
@@ -1685,6 +1723,7 @@
         searchAria: "Search skills",
         searchPlaceholder: "Search names, purpose, notes, paths",
         refresh: "Refresh",
+        updateDashboard: "Update",
         clearExamples: "Clear examples",
         skills: "Skills",
         examples: "Examples",
@@ -1706,6 +1745,24 @@
         platformFilter: "Platform",
         categoryFilter: "Use case",
         copyPrompt: "Copy prompt",
+        updateInfo: "Update",
+        updateAvailable: "Updatable",
+        updateUnavailable: "Local install",
+        updateSkill: "Update skill",
+        copyUpdateCommand: "Copy update command",
+        updateCommand: "Update command",
+        gitRepo: "Git repository",
+        branch: "Branch",
+        upstream: "Upstream",
+        updateConfirmTitle: "Confirm Update",
+        updateConfirmSkill: "Run git pull --ff-only for {name}. If local edits exist, Git will stop instead of overwriting them.",
+        updateConfirmDashboard: "Update Skill Dashboard itself. Refresh the page or restart the dashboard after it finishes.",
+        updateDone: "Update complete",
+        updateFailed: "Update failed",
+        updateCopied: "Update command copied",
+        updateApiUnavailable: "This page is not in localhost service mode, so the update command was copied instead.",
+        updateManualNote: "This skill is not installed from a git upstream, so it cannot be updated automatically. Reinstall it from its source or replace the files manually.",
+        updating: "Updating...",
         close: "Close",
         purpose: "Purpose",
         location: "Location",
@@ -1732,6 +1789,7 @@
         themeDaylight: "Daylight",
         helpLanguage: "Switch the interface language. Original skill text is kept as-is.",
         helpTheme: "Switch between the dark Orbit theme and the light Daylight theme.",
+        helpUpdateDashboard: "Update skill-dashboard itself. Requires localhost service mode and git.",
         helpRefresh: "Reload this dashboard. Restart the generator when local skills changed.",
         helpClearExamples: "Clear locally saved example previews. Skill files are not touched.",
         helpSearch: "Fuzzy search skill names, descriptions, use cases, platforms, and paths.",
@@ -1743,6 +1801,8 @@
         helpSort: "Change the ordering of the current result set.",
         helpRank: "Click to filter by this use case.",
         helpCard: "Click to open details, usage notes, and examples.",
+        helpUpdateSkill: "Safely update this git-installed skill on your machine.",
+        helpCopyUpdate: "Copy the update command for manual terminal use.",
         helpCopyPrompt: "Copy this skill's default invocation prompt.",
         helpClose: "Close the detail panel.",
         helpGenerate: "Generate a local preview from SKILL.md metadata. No model call is made.",
@@ -1773,6 +1833,8 @@
       perPage: 10,
       selectedId: null,
       pendingGenerateId: null,
+      pendingAction: null,
+      pendingUpdateId: null,
       lang: localStorage.getItem(LANG_KEY) === "en" ? "en" : "zh",
       theme: THEMES.includes(localStorage.getItem(THEME_KEY)) ? localStorage.getItem(THEME_KEY) : "orbit",
     };
@@ -1820,6 +1882,18 @@
         "Plugin skills": "Plugin skills",
         "Custom": "Custom",
       }[label] || label;
+    }
+
+    function updateLabel(skill) {
+      return skill.update && skill.update.available ? t("updateAvailable") : t("updateUnavailable");
+    }
+
+    function updateCommandFor(skill) {
+      return (skill.update && skill.update.command) || "";
+    }
+
+    function isLocalServiceMode() {
+      return window.location.protocol === "http:" || window.location.protocol === "https:";
     }
 
     function normalize(value) {
@@ -1914,6 +1988,8 @@
       $("#searchLabel").setAttribute("aria-label", t("searchAria"));
       $("#searchLabel").setAttribute("data-help", t("helpSearch"));
       $("#searchInput").placeholder = t("searchPlaceholder");
+      $("#updateDashboardBtn").textContent = t("updateDashboard");
+      $("#updateDashboardBtn").setAttribute("data-help", t("helpUpdateDashboard"));
       $("#refreshBtn").textContent = t("refresh");
       $("#refreshBtn").setAttribute("data-help", t("helpRefresh"));
       $("#clearExamplesBtn").textContent = t("clearExamples");
@@ -2059,6 +2135,7 @@
           <div class="tag-row">
             ${skill.platforms.slice(0, 2).map((tag) => `<span class="tag platform">${escapeHTML(tag)}</span>`).join("")}
             ${skill.categories.slice(0, 3).map((tag, i) => `<span class="tag ${i === 0 ? "hot" : ""}">${escapeHTML(categoryLabel(tag))}</span>`).join("")}
+            <span class="tag ${skill.update && skill.update.available ? "update" : ""}">${escapeHTML(updateLabel(skill))}</span>
           </div>
         </article>
       `).join("");
@@ -2133,6 +2210,7 @@
             <p class="path-line">${escapeHTML(skill.path)}</p>
           </section>
         </div>
+        ${renderUpdateSection(skill)}
         <section class="drawer-section">
           <h3>${escapeHTML(t("usage"))}</h3>
           <div class="instruction-list">
@@ -2150,6 +2228,47 @@
             <button class="primary-btn" type="button" data-generate="${escapeHTML(skill.id)}" data-help="${escapeHTML(t("helpGenerate"))}">${escapeHTML(example ? t("regenerate") : t("generate"))}</button>
           </div>
           ${example ? renderExample(example) : renderExampleEmpty(skill)}
+        </section>
+      `;
+    }
+
+    function renderUpdateSection(skill) {
+      const update = skill.update || {};
+      const command = updateCommandFor(skill);
+      if (!update.available) {
+        return `
+          <section class="drawer-section">
+            <h3>${escapeHTML(t("updateInfo"))}</h3>
+            <div class="tag-row"><span class="tag">${escapeHTML(t("updateUnavailable"))}</span></div>
+            <p>${escapeHTML(update.note || t("updateManualNote"))}</p>
+            ${command ? `<div class="prompt-box" style="margin-top:12px"><strong>${escapeHTML(t("updateCommand"))}</strong><code>${escapeHTML(command)}</code></div>` : ""}
+          </section>
+        `;
+      }
+      return `
+        <section class="drawer-section">
+          <div class="example-head">
+            <h3>${escapeHTML(t("updateInfo"))}</h3>
+            <div class="tag-row"><span class="tag update">${escapeHTML(t("updateAvailable"))}</span></div>
+          </div>
+          <div class="instruction-list">
+            <div class="instruction-item">
+              <strong>${escapeHTML(t("gitRepo"))}</strong>
+              <p>${escapeHTML(update.remote || update.repoRoot || "")}</p>
+            </div>
+            <div class="instruction-item">
+              <strong>${escapeHTML(t("branch"))}</strong>
+              <p>${escapeHTML([update.branch, update.upstream].filter(Boolean).join(" -> "))}</p>
+            </div>
+          </div>
+          <div class="prompt-box" style="margin-top:12px">
+            <strong>${escapeHTML(t("updateCommand"))}</strong>
+            <code>${escapeHTML(command)}</code>
+          </div>
+          <div class="update-actions">
+            <button class="primary-btn" type="button" data-update-skill="${escapeHTML(skill.id)}" data-help="${escapeHTML(t("helpUpdateSkill"))}">${escapeHTML(t("updateSkill"))}</button>
+            <button class="ghost-btn" type="button" data-copy-update="${escapeHTML(skill.id)}" data-help="${escapeHTML(t("helpCopyUpdate"))}">${escapeHTML(t("copyUpdateCommand"))}</button>
+          </div>
         </section>
       `;
     }
@@ -2183,8 +2302,11 @@
     function requestGenerate(id) {
       const skill = skillById(id);
       if (!skill) return;
+      state.pendingAction = "generate";
       state.pendingGenerateId = id;
       $("#confirmText").textContent = needsTokenNotice(skill) ? t("tokenNotice") : t("localNotice");
+      $("#confirmTitle").textContent = t("generateTitle");
+      $("#confirmGenerateBtn").textContent = t("generateLocal");
       $("#confirmModal").classList.add("open");
     }
 
@@ -2200,6 +2322,90 @@
       $("#confirmModal").classList.remove("open");
       openDrawer(skill.id);
       showToast(t("exampleGenerated"));
+    }
+
+    function requestUpdateSkill(id) {
+      const skill = skillById(id);
+      if (!skill) return;
+      if (!isLocalServiceMode()) {
+        copyUpdateCommand(id, "updateApiUnavailable");
+        return;
+      }
+      state.pendingAction = "update-skill";
+      state.pendingUpdateId = id;
+      $("#confirmTitle").textContent = t("updateConfirmTitle");
+      $("#confirmText").textContent = t("updateConfirmSkill", { name: skill.displayName });
+      $("#confirmGenerateBtn").textContent = t("updateSkill");
+      $("#confirmModal").classList.add("open");
+    }
+
+    function requestUpdateDashboard() {
+      if (!isLocalServiceMode()) {
+        const command = DATA.dashboardUpdate && DATA.dashboardUpdate.command;
+        copyText(command || "", "updateApiUnavailable");
+        return;
+      }
+      state.pendingAction = "update-dashboard";
+      state.pendingUpdateId = null;
+      $("#confirmTitle").textContent = t("updateConfirmTitle");
+      $("#confirmText").textContent = t("updateConfirmDashboard");
+      $("#confirmGenerateBtn").textContent = t("updateDashboard");
+      $("#confirmModal").classList.add("open");
+    }
+
+    function confirmPendingAction() {
+      if (state.pendingAction === "generate") {
+        confirmGenerate();
+        return;
+      }
+      if (state.pendingAction === "update-skill") {
+        confirmUpdateSkill();
+        return;
+      }
+      if (state.pendingAction === "update-dashboard") {
+        confirmUpdateDashboard();
+      }
+    }
+
+    async function postUpdate(endpoint, payload = {}) {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) {
+        throw new Error(data.stderr || data.stdout || t("updateFailed"));
+      }
+      return data;
+    }
+
+    async function confirmUpdateSkill() {
+      const skill = skillById(state.pendingUpdateId);
+      if (!skill) return;
+      await runUpdate(() => postUpdate("/api/update-skill", { id: skill.id }));
+    }
+
+    async function confirmUpdateDashboard() {
+      await runUpdate(() => postUpdate("/api/update-dashboard"));
+    }
+
+    async function runUpdate(task) {
+      const button = $("#confirmGenerateBtn");
+      const previousText = button.textContent;
+      button.disabled = true;
+      button.textContent = t("updating");
+      try {
+        await task();
+        $("#confirmModal").classList.remove("open");
+        showToast(t("updateDone"));
+      } catch (error) {
+        const message = error && error.message ? String(error.message) : t("updateFailed");
+        showToast(`${t("updateFailed")}: ${message.slice(0, 120)}`);
+      } finally {
+        button.disabled = false;
+        button.textContent = previousText;
+      }
     }
 
     function buildExample(skill) {
@@ -2314,6 +2520,22 @@
       }
     }
 
+    async function copyText(text, successKey = "updateCopied") {
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(t(successKey));
+      } catch {
+        showToast(t("copyFailed"));
+      }
+    }
+
+    async function copyUpdateCommand(id, successKey = "updateCopied") {
+      const skill = skillById(id);
+      const text = skill ? updateCommandFor(skill) : "";
+      await copyText(text, successKey);
+    }
+
     function formatTime(value) {
       if (!value) return "";
       const date = new Date(value);
@@ -2376,14 +2598,19 @@
         $("#resultsPanel").scrollIntoView({ behavior: "smooth", block: "start" });
       });
       $("#drawerBody").addEventListener("click", (event) => {
-        const button = event.target.closest("[data-generate]");
-        if (button) requestGenerate(button.dataset.generate);
+        const generateButton = event.target.closest("[data-generate]");
+        if (generateButton) requestGenerate(generateButton.dataset.generate);
+        const updateButton = event.target.closest("[data-update-skill]");
+        if (updateButton) requestUpdateSkill(updateButton.dataset.updateSkill);
+        const copyUpdateButton = event.target.closest("[data-copy-update]");
+        if (copyUpdateButton) copyUpdateCommand(copyUpdateButton.dataset.copyUpdate);
       });
       $("#closeDrawerBtn").addEventListener("click", closeDrawer);
       drawerBackdrop.addEventListener("click", closeDrawer);
       $("#copyPromptBtn").addEventListener("click", copyPrompt);
       $("#cancelGenerateBtn").addEventListener("click", () => $("#confirmModal").classList.remove("open"));
-      $("#confirmGenerateBtn").addEventListener("click", confirmGenerate);
+      $("#confirmGenerateBtn").addEventListener("click", confirmPendingAction);
+      $("#updateDashboardBtn").addEventListener("click", requestUpdateDashboard);
       $("#refreshBtn").addEventListener("click", () => window.location.reload());
       $("#clearExamplesBtn").addEventListener("click", () => {
         examples = {};

@@ -29,13 +29,6 @@ npx skills add https://github.com/RyanZheng5588/skills-dashboard --skill skill-d
 git clone https://github.com/RyanZheng5588/skills-dashboard.git ~/.codex/skills/skill-dashboard
 ```
 
-已经安装过的话，更新：
-
-```bash
-cd ~/.codex/skills/skill-dashboard
-git pull
-```
-
 ## 使用
 
 安装后可以对 Codex 说：
@@ -64,6 +57,25 @@ open ~/.codex/skills/skill-dashboard/Skill\ Dashboard.command
 skill-dashboard
 ```
 
+更新 Skill Dashboard：
+
+```bash
+open ~/.codex/skills/skill-dashboard/Skill\ Dashboard\ Update.command
+```
+
+或：
+
+```bash
+skill-dashboard-update
+```
+
+如果你是用 `git clone` 手动安装，也可以继续用：
+
+```bash
+cd ~/.codex/skills/skill-dashboard
+git pull --ff-only
+```
+
 底层命令仍然保留，适合自定义参数：
 
 ```bash
@@ -89,6 +101,7 @@ SKILL_DASHBOARD_ROOTS="$HOME/work/skills:$HOME/.custom/skills" \
 - 按平台浏览：Codex、Claude、Hermes、Other。
 - 按用途浏览：文案、图片、视频、PPT、排版、数据、代码、知识库、自动化、设计、文档、音频、研究等。
 - 支持对 skill 名称、描述、使用说明、分类、平台和路径进行模糊搜索。
+- 支持识别 git 安装的 skills，并在 localhost 模式下点击更新。
 - 卡片式目录、分页、右侧用途榜单、详情抽屉。
 - 中英文 UI 切换。
 - Orbit 暗色主题与 Daylight 浅色主题。
@@ -111,9 +124,11 @@ references/classification.md
 scripts/
   skill_dashboard.py
   start.sh
+  update.sh
   install.sh
   check.sh
 Skill Dashboard.command
+Skill Dashboard Update.command
 ```
 
 ## 开发
@@ -137,7 +152,7 @@ open /tmp/skill-dashboard-preview/index.html
 ./scripts/install.sh
 ```
 
-安装脚本会复制 skill 到 `~/.codex/skills/skill-dashboard`，并创建 `~/.local/bin/skill-dashboard` 作为一键启动命令。
+安装脚本会复制 skill 到 `~/.codex/skills/skill-dashboard`，并创建 `~/.local/bin/skill-dashboard` 和 `~/.local/bin/skill-dashboard-update`。
 
 ## 隐私
 

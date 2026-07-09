@@ -15,7 +15,9 @@ PY
 PYTHONDONTWRITEBYTECODE=1 python3 "$SKILL_DIR/scripts/skill_dashboard.py" --out "$OUT_DIR" --quiet
 bash -n "$SKILL_DIR/scripts/start.sh"
 bash -n "$SKILL_DIR/scripts/install.sh"
+bash -n "$SKILL_DIR/scripts/update.sh"
 bash -n "$SKILL_DIR/Skill Dashboard.command"
+bash -n "$SKILL_DIR/Skill Dashboard Update.command"
 
 python3 - "$OUT_DIR" <<'PY'
 import json

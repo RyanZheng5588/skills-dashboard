@@ -1,6 +1,6 @@
 ---
 name: skill-dashboard
-description: Build and open an interactive local dashboard for discovering installed skills across Codex, Claude, Hermes, agents, and plugin caches. Use when the user asks to browse, search, classify, audit, preview, or compare local skills; when they want card-based skill inventory views; or when they want examples and usage details generated from SKILL.md files.
+description: Build, open, and update an interactive local dashboard for discovering installed skills across Codex, Claude, Hermes, agents, and plugin caches. Use when the user asks to browse, search, classify, audit, preview, update, or compare local skills; when they want card-based skill inventory views; or when they want examples and usage details generated from SKILL.md files.
 ---
 
 # Skill Dashboard
@@ -23,6 +23,14 @@ skill-dashboard
 
 This scans local skill roots, writes a self-contained bilingual dashboard to `~/.codex/skills/skill-dashboard/.dashboard/index.html`, starts a localhost service, and opens it in the browser.
 
+To update Skill Dashboard itself, use:
+
+```bash
+~/.codex/skills/skill-dashboard/scripts/update.sh
+```
+
+On macOS, the same updater can be opened from Finder by double-clicking `~/.codex/skills/skill-dashboard/Skill Dashboard Update.command`. If `scripts/install.sh` has been run, `skill-dashboard-update` is also available.
+
 For advanced custom options, call the builder directly:
 
 ```bash
@@ -37,7 +45,8 @@ python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --serve --ope
 4. Use category chips for usage dimensions such as `文案`, `图片`, `视频`, `PPT`, `排版`, `数据`, `代码`, `知识库`, `自动化`, `设计`, `文档`, `音频`, and `研究`.
 5. Use fuzzy search for skill name, display name, description, purpose, category, platform, and path.
 6. Click a card to inspect purpose, source path, parsed usage sections, and example previews.
-7. Switch between Chinese and English UI labels, and between the Orbit dark theme and Daylight light theme.
+7. Use the update section in a detail drawer to copy update commands or update git-installed skills when the dashboard is running in localhost mode.
+8. Switch between Chinese and English UI labels, and between the Orbit dark theme and Daylight light theme.
 
 ## Custom Roots
 

@@ -27,13 +27,6 @@ Manual install:
 git clone https://github.com/RyanZheng5588/skills-dashboard.git ~/.codex/skills/skill-dashboard
 ```
 
-Update:
-
-```bash
-cd ~/.codex/skills/skill-dashboard
-git pull
-```
-
 ## Use
 
 After installation, ask Codex:
@@ -62,6 +55,25 @@ If you installed or refreshed the skill with `scripts/install.sh`, it also creat
 skill-dashboard
 ```
 
+Update Skill Dashboard:
+
+```bash
+open ~/.codex/skills/skill-dashboard/Skill\ Dashboard\ Update.command
+```
+
+Or:
+
+```bash
+skill-dashboard-update
+```
+
+If you installed manually with `git clone`, you can still use:
+
+```bash
+cd ~/.codex/skills/skill-dashboard
+git pull --ff-only
+```
+
 The lower-level builder is still available for custom options:
 
 ```bash
@@ -80,6 +92,7 @@ python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --root ~/my-s
 - Browse by platform: Codex, Claude, Hermes, and Other.
 - Browse by use case: copy, images, video, slides, layout, data, code, knowledge, automation, design, docs, audio, research, and more.
 - Fuzzy search across skill names, descriptions, usage notes, categories, platforms, and paths.
+- Detects git-installed skills and supports click-to-update in localhost mode.
 - Card-based directory with pagination, ranking rail, and click-through detail drawer.
 - Bilingual UI: Chinese and English.
 - Theme switching: Orbit dark theme and Daylight light theme.
@@ -102,9 +115,11 @@ references/classification.md
 scripts/
   skill_dashboard.py
   start.sh
+  update.sh
   install.sh
   check.sh
 Skill Dashboard.command
+Skill Dashboard Update.command
 ```
 
 ## Development
@@ -128,7 +143,7 @@ Install the working tree version:
 ./scripts/install.sh
 ```
 
-The install script copies the skill into `~/.codex/skills/skill-dashboard` and creates `~/.local/bin/skill-dashboard` as a one-command launcher.
+The install script copies the skill into `~/.codex/skills/skill-dashboard` and creates `~/.local/bin/skill-dashboard` plus `~/.local/bin/skill-dashboard-update`.
 
 ## Privacy
 
