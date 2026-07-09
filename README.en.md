@@ -42,13 +42,27 @@ After installation, ask Codex:
 Use $skill-dashboard to open the local skill dashboard.
 ```
 
-Or run:
+The simplest macOS one-click start is:
 
 ```bash
-python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --open
+open ~/.codex/skills/skill-dashboard/Skill\ Dashboard.command
 ```
 
-Serve over localhost:
+You can also open `~/.codex/skills/skill-dashboard` in Finder and double-click `Skill Dashboard.command`. It starts the local server and opens the browser.
+
+Terminal start:
+
+```bash
+~/.codex/skills/skill-dashboard/scripts/start.sh
+```
+
+If you installed or refreshed the skill with `scripts/install.sh`, it also creates this short command:
+
+```bash
+skill-dashboard
+```
+
+The lower-level builder is still available for custom options:
 
 ```bash
 python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --serve --open
@@ -87,8 +101,10 @@ assets/dashboard.html
 references/classification.md
 scripts/
   skill_dashboard.py
+  start.sh
   install.sh
   check.sh
+Skill Dashboard.command
 ```
 
 ## Development
@@ -111,6 +127,8 @@ Install the working tree version:
 ```bash
 ./scripts/install.sh
 ```
+
+The install script copies the skill into `~/.codex/skills/skill-dashboard` and creates `~/.local/bin/skill-dashboard` as a one-command launcher.
 
 ## Privacy
 

@@ -273,6 +273,95 @@
       box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent), 0 0 26px color-mix(in srgb, var(--accent) 10%, transparent);
     }
 
+    [data-help] {
+      position: relative;
+    }
+
+    [data-help]::after {
+      content: attr(data-help);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      z-index: 90;
+      width: max-content;
+      max-width: 280px;
+      padding: 9px 10px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface-strong);
+      color: var(--soft);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      font-weight: 560;
+      line-height: 1.45;
+      text-align: left;
+      white-space: normal;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, 6px);
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+
+    [data-help]::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      z-index: 91;
+      width: 10px;
+      height: 10px;
+      border-right: 1px solid var(--line-strong);
+      border-bottom: 1px solid var(--line-strong);
+      background: var(--surface-strong);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, 6px) rotate(45deg);
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+
+    [data-help]:hover::after,
+    [data-help]:hover::before,
+    [data-help]:focus-visible::after,
+    [data-help]:focus-visible::before,
+    [data-help]:focus-within::after,
+    [data-help]:focus-within::before {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .top-actions [data-help]::after,
+    .drawer-actions [data-help]::after,
+    .example-head [data-help]::after {
+      left: auto;
+      right: 0;
+      transform: translate(0, 6px);
+    }
+
+    .top-actions [data-help]::before,
+    .drawer-actions [data-help]::before,
+    .example-head [data-help]::before {
+      left: auto;
+      right: 16px;
+      transform: translate(0, 6px) rotate(45deg);
+    }
+
+    .top-actions [data-help]:hover::after,
+    .top-actions [data-help]:hover::before,
+    .top-actions [data-help]:focus-visible::after,
+    .top-actions [data-help]:focus-visible::before,
+    .top-actions [data-help]:focus-within::after,
+    .top-actions [data-help]:focus-within::before,
+    .drawer-actions [data-help]:hover::after,
+    .drawer-actions [data-help]:hover::before,
+    .drawer-actions [data-help]:focus-visible::after,
+    .drawer-actions [data-help]:focus-visible::before,
+    .example-head [data-help]:hover::after,
+    .example-head [data-help]:hover::before,
+    .example-head [data-help]:focus-visible::after,
+    .example-head [data-help]:focus-visible::before {
+      transform: translate(0, 0);
+    }
+
     .layout {
       width: min(1320px, calc(100vw - 32px));
       margin: 0 auto;
@@ -1359,13 +1448,13 @@
         </div>
       </div>
       <div class="top-actions">
-        <div id="langSwitch" class="segmented" aria-label="Language">
+        <div id="langSwitch" class="segmented" aria-label="Language" data-help="">
           <button id="langZhBtn" class="seg-btn active" type="button" data-lang="zh">中</button>
           <button id="langEnBtn" class="seg-btn" type="button" data-lang="en">EN</button>
         </div>
-        <button id="themeBtn" class="ghost-btn" type="button">Orbit</button>
-        <button id="refreshBtn" class="ghost-btn" type="button">刷新</button>
-        <button id="clearExamplesBtn" class="ghost-btn" type="button">清空案例</button>
+        <button id="themeBtn" class="ghost-btn" type="button" data-help="">Orbit</button>
+        <button id="refreshBtn" class="ghost-btn" type="button" data-help="">刷新</button>
+        <button id="clearExamplesBtn" class="ghost-btn" type="button" data-help="">清空案例</button>
       </div>
     </header>
 
@@ -1378,10 +1467,10 @@
             <p id="heroSubtitle">按平台、用途和真实说明快速找到可用 skill。</p>
           </div>
           <div class="hero-search">
-            <label id="searchLabel" class="search-wrap" aria-label="搜索 skill">
+            <label id="searchLabel" class="search-wrap" aria-label="搜索 skill" data-help="">
               <input id="searchInput" class="search-input" type="search" autocomplete="off" placeholder="搜索名称、用途、说明、路径">
             </label>
-            <button id="focusResultsBtn" class="primary-btn" type="button">浏览技能</button>
+            <button id="focusResultsBtn" class="primary-btn" type="button" data-help="">浏览技能</button>
           </div>
         </div>
         <div class="hero-visual" aria-hidden="true">
@@ -1397,17 +1486,17 @@
 
       <section class="command-strip" aria-label="Controls">
         <div class="metric-row">
-          <div class="metric">
+          <div id="metricSkillsBox" class="metric" data-help="">
             <strong id="metricSkills">0</strong>
             <span id="metricSkillsLabel">Skills</span>
           </div>
-          <div class="metric">
+          <div id="metricExamplesBox" class="metric" data-help="">
             <strong id="metricExamples">0</strong>
             <span id="metricExamplesLabel">Examples</span>
           </div>
         </div>
         <div id="platformTabs" class="tabbar"></div>
-        <select id="sortSelect" class="sort-select" aria-label="排序">
+        <select id="sortSelect" class="sort-select" aria-label="排序" title="">
           <option value="relevance">相关度</option>
           <option value="name">名称</option>
           <option value="modified">最近修改</option>
@@ -1452,8 +1541,8 @@
         <div id="drawerTags" class="tag-row" style="margin-top:14px"></div>
       </div>
       <div class="drawer-actions">
-        <button id="copyPromptBtn" class="ghost-btn" type="button">复制调用</button>
-        <button id="closeDrawerBtn" class="icon-btn" type="button" aria-label="关闭">×</button>
+        <button id="copyPromptBtn" class="ghost-btn" type="button" data-help="">复制调用</button>
+        <button id="closeDrawerBtn" class="icon-btn" type="button" aria-label="关闭" data-help="">×</button>
       </div>
     </div>
     <div id="drawerBody" class="drawer-body"></div>
@@ -1554,6 +1643,22 @@
         copyFailed: "当前浏览器限制了剪贴板访问",
         themeOrbit: "Orbit",
         themeDaylight: "Daylight",
+        helpLanguage: "切换界面语言。Skill 原文保持原样，不会自动翻译。",
+        helpTheme: "切换深色 Orbit 与浅色 Daylight 主题。",
+        helpRefresh: "重新载入当前 dashboard。若本机 skill 变了，请重新启动生成器。",
+        helpClearExamples: "清空浏览器本地保存的案例预览，不会删除任何 skill 文件。",
+        helpSearch: "模糊搜索 skill 名称、描述、用途、平台和路径。",
+        helpBrowse: "跳到技能列表，从筛选结果里打开详情。",
+        helpSkillCount: "当前扫描到的本机 skills 总数。",
+        helpExampleCount: "已在这个浏览器里生成过本地预览的案例数量。",
+        helpPlatform: "只显示 {name} 平台相关的 skills。",
+        helpCategory: "只显示偏向「{name}」用途的 skills。",
+        helpSort: "调整当前结果的排序方式。",
+        helpRank: "点击后筛选这个用途分类。",
+        helpCard: "点击打开详情、使用说明和案例预览。",
+        helpCopyPrompt: "复制这个 skill 的默认调用提示词。",
+        helpClose: "关闭详情面板。",
+        helpGenerate: "基于 SKILL.md 元数据生成本地案例预览，不会调用模型。",
         featured: "Featured skill",
         visualDirection: "视觉方向",
         imageCandidate: "{cap}：生成 4 个候选方向",
@@ -1625,6 +1730,22 @@
         copyFailed: "Clipboard access is blocked in this browser",
         themeOrbit: "Orbit",
         themeDaylight: "Daylight",
+        helpLanguage: "Switch the interface language. Original skill text is kept as-is.",
+        helpTheme: "Switch between the dark Orbit theme and the light Daylight theme.",
+        helpRefresh: "Reload this dashboard. Restart the generator when local skills changed.",
+        helpClearExamples: "Clear locally saved example previews. Skill files are not touched.",
+        helpSearch: "Fuzzy search skill names, descriptions, use cases, platforms, and paths.",
+        helpBrowse: "Jump to the skill list and open details from the filtered results.",
+        helpSkillCount: "Total local skills found in this scan.",
+        helpExampleCount: "Example previews generated in this browser.",
+        helpPlatform: "Show skills related to the {name} platform.",
+        helpCategory: "Show skills categorized as {name}.",
+        helpSort: "Change the ordering of the current result set.",
+        helpRank: "Click to filter by this use case.",
+        helpCard: "Click to open details, usage notes, and examples.",
+        helpCopyPrompt: "Copy this skill's default invocation prompt.",
+        helpClose: "Close the detail panel.",
+        helpGenerate: "Generate a local preview from SKILL.md metadata. No model call is made.",
         featured: "Featured skill",
         visualDirection: "visual direction",
         imageCandidate: "{cap}: generate 4 directions",
@@ -1746,8 +1867,8 @@
         if (name.includes(token)) score += 34;
         if (text.includes(token)) score += 12;
       });
-      if (isSubsequence(q, name)) score += 30;
-      if (score === 0 && isSubsequence(q, text)) score += 12;
+      if (q.length >= 3 && isSubsequence(q, name)) score += 30;
+      if (score === 0 && q.length >= 4 && isSubsequence(q, text)) score += 12;
       return score;
     }
 
@@ -1791,27 +1912,38 @@
       $("#heroSubtitle").textContent = t("heroSubtitle");
       $("#focusResultsBtn").textContent = t("browseSkills");
       $("#searchLabel").setAttribute("aria-label", t("searchAria"));
+      $("#searchLabel").setAttribute("data-help", t("helpSearch"));
       $("#searchInput").placeholder = t("searchPlaceholder");
       $("#refreshBtn").textContent = t("refresh");
+      $("#refreshBtn").setAttribute("data-help", t("helpRefresh"));
       $("#clearExamplesBtn").textContent = t("clearExamples");
+      $("#clearExamplesBtn").setAttribute("data-help", t("helpClearExamples"));
       $("#metricSkillsLabel").textContent = t("skills");
       $("#metricExamplesLabel").textContent = t("examples");
+      $("#metricSkillsBox").setAttribute("data-help", t("helpSkillCount"));
+      $("#metricExamplesBox").setAttribute("data-help", t("helpExampleCount"));
       $("#resultsTitle").textContent = t("resultsTitle");
       $("#categoryRailKicker").textContent = t("topCategories");
       $("#categoryRailTitle").textContent = t("categoryRailTitle");
       $("#sourceRailKicker").textContent = t("sources");
       $("#sourceRailTitle").textContent = t("sourceRailTitle");
       $("#sortSelect").setAttribute("aria-label", t("sortAria"));
+      $("#sortSelect").setAttribute("title", t("helpSort"));
       $("#sortSelect").options[0].textContent = t("sortRelevance");
       $("#sortSelect").options[1].textContent = t("sortName");
       $("#sortSelect").options[2].textContent = t("sortModified");
       $("#sortSelect").options[3].textContent = t("sortSource");
       $("#pagination").setAttribute("aria-label", "Pagination");
       $("#copyPromptBtn").textContent = t("copyPrompt");
+      $("#copyPromptBtn").setAttribute("data-help", t("helpCopyPrompt"));
       $("#closeDrawerBtn").setAttribute("aria-label", t("close"));
+      $("#closeDrawerBtn").setAttribute("data-help", t("helpClose"));
       $("#confirmTitle").textContent = t("generateTitle");
       $("#cancelGenerateBtn").textContent = t("cancel");
       $("#confirmGenerateBtn").textContent = t("generateLocal");
+      $("#langSwitch").setAttribute("data-help", t("helpLanguage"));
+      $("#themeBtn").setAttribute("data-help", t("helpTheme"));
+      $("#focusResultsBtn").setAttribute("data-help", t("helpBrowse"));
       $("#langZhBtn").classList.toggle("active", state.lang === "zh");
       $("#langEnBtn").classList.toggle("active", state.lang === "en");
       applyTheme();
@@ -1848,7 +1980,8 @@
       const tabs = DATA.platformOrder || [ALL, "Codex", "Claude", "Hermes", "Other"];
       $("#platformTabs").innerHTML = tabs.map((tab) => {
         const count = tab === ALL ? DATA.skillCount : (DATA.platformCounts || {})[tab] || 0;
-        return `<button class="tab ${state.platform === tab ? "active" : ""}" type="button" data-platform="${escapeHTML(tab)}">${escapeHTML(platformLabel(tab))} · ${count}</button>`;
+        const help = t("helpPlatform", { name: platformLabel(tab) });
+        return `<button class="tab ${state.platform === tab ? "active" : ""}" type="button" data-platform="${escapeHTML(tab)}" data-help="${escapeHTML(help)}">${escapeHTML(platformLabel(tab))} · ${count}</button>`;
       }).join("");
     }
 
@@ -1856,7 +1989,8 @@
       const categories = DATA.categoryOrder || [ALL];
       $("#categoryChips").innerHTML = categories.map((category) => {
         const count = category === ALL ? DATA.skillCount : (DATA.categoryCounts || {})[category] || 0;
-        return `<button class="chip ${state.category === category ? "active" : ""}" type="button" data-category="${escapeHTML(category)}">${escapeHTML(categoryLabel(category))} ${count}</button>`;
+        const help = t("helpCategory", { name: categoryLabel(category) });
+        return `<button class="chip ${state.category === category ? "active" : ""}" type="button" data-category="${escapeHTML(category)}" data-help="${escapeHTML(help)}">${escapeHTML(categoryLabel(category))} ${count}</button>`;
       }).join("");
     }
 
@@ -1867,7 +2001,7 @@
         .sort((a, b) => b[1] - a[1])
         .slice(0, 6);
       $("#categoryRank").innerHTML = items.map(([category, count], index) => `
-        <button class="rank-item" type="button" data-category="${escapeHTML(category)}">
+        <button class="rank-item" type="button" data-category="${escapeHTML(category)}" data-help="${escapeHTML(t("helpRank"))}">
           <span class="rank-index">${index + 1}</span>
           <strong>${escapeHTML(categoryLabel(category))}</strong>
           <span>${count}</span>
@@ -1915,7 +2049,7 @@
         return;
       }
       grid.innerHTML = items.map(({ skill }, index) => `
-        <article class="skill-card" style="animation-delay:${Math.min(index * 24, 180)}ms" tabindex="0" data-id="${escapeHTML(skill.id)}">
+        <article class="skill-card" style="animation-delay:${Math.min(index * 24, 180)}ms" tabindex="0" data-id="${escapeHTML(skill.id)}" title="${escapeHTML(t("helpCard"))}">
           <div class="card-top">
             <span class="source">${escapeHTML(skill.source)}</span>
             <span>${escapeHTML(formatTime(skill.modified))}</span>
@@ -2013,7 +2147,7 @@
         <section class="drawer-section">
           <div class="example-head">
             <h3>${escapeHTML(t("example"))}</h3>
-            <button class="primary-btn" type="button" data-generate="${escapeHTML(skill.id)}">${escapeHTML(example ? t("regenerate") : t("generate"))}</button>
+            <button class="primary-btn" type="button" data-generate="${escapeHTML(skill.id)}" data-help="${escapeHTML(t("helpGenerate"))}">${escapeHTML(example ? t("regenerate") : t("generate"))}</button>
           </div>
           ${example ? renderExample(example) : renderExampleEmpty(skill)}
         </section>

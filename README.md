@@ -44,13 +44,27 @@ git pull
 Use $skill-dashboard to open the local skill dashboard.
 ```
 
-也可以直接运行：
+普通用户最简单的方式是在 macOS 上一键打开：
 
 ```bash
-python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --open
+open ~/.codex/skills/skill-dashboard/Skill\ Dashboard.command
 ```
 
-使用 localhost：
+也可以在 Finder 里进入 `~/.codex/skills/skill-dashboard`，双击 `Skill Dashboard.command`。它会自动启动本地服务并打开浏览器。
+
+终端里直接运行：
+
+```bash
+~/.codex/skills/skill-dashboard/scripts/start.sh
+```
+
+如果你用 `scripts/install.sh` 整理过安装，还会额外创建一个短命令：
+
+```bash
+skill-dashboard
+```
+
+底层命令仍然保留，适合自定义参数：
 
 ```bash
 python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --serve --open
@@ -96,8 +110,10 @@ assets/dashboard.html
 references/classification.md
 scripts/
   skill_dashboard.py
+  start.sh
   install.sh
   check.sh
+Skill Dashboard.command
 ```
 
 ## 开发
@@ -120,6 +136,8 @@ open /tmp/skill-dashboard-preview/index.html
 ```bash
 ./scripts/install.sh
 ```
+
+安装脚本会复制 skill 到 `~/.codex/skills/skill-dashboard`，并创建 `~/.local/bin/skill-dashboard` 作为一键启动命令。
 
 ## 隐私
 

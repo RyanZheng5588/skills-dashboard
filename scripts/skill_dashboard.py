@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import html
 import json
 import os
 import re
@@ -651,7 +650,8 @@ def serve_directory(out_dir: Path, preferred_port: int, open_browser: bool) -> N
 
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     url = f"http://127.0.0.1:{port}/index.html"
-    print(f"Skill Dashboard serving {html.escape(url)}")
+    print(f"Skill Dashboard is running: {url}")
+    print("Press Ctrl+C in this terminal to stop the local server.")
     if open_browser:
         webbrowser.open(url)
     try:

@@ -7,15 +7,23 @@ description: Build and open an interactive local dashboard for discovering insta
 
 ## Quick Start
 
-Run the bundled builder:
+Use the bundled one-click launcher first:
 
 ```bash
-python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --open
+~/.codex/skills/skill-dashboard/scripts/start.sh
 ```
 
-This scans local skill roots, writes a self-contained bilingual dashboard to `~/.codex/skills/skill-dashboard/.dashboard/index.html`, and opens it in the browser.
+On macOS, the same launcher can be opened from Finder by double-clicking `~/.codex/skills/skill-dashboard/Skill Dashboard.command`.
 
-For a localhost URL instead:
+If `scripts/install.sh` has been run, the short command is also available:
+
+```bash
+skill-dashboard
+```
+
+This scans local skill roots, writes a self-contained bilingual dashboard to `~/.codex/skills/skill-dashboard/.dashboard/index.html`, starts a localhost service, and opens it in the browser.
+
+For advanced custom options, call the builder directly:
 
 ```bash
 python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --serve --open
