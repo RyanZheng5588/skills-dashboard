@@ -1,98 +1,131 @@
 # Skill Dashboard
 
-An installable Codex skill that scans local skill folders and builds a self-contained browser dashboard for discovering, filtering, and previewing skills.
+![Skill](https://img.shields.io/badge/Skill-Agent-111111?style=flat-square)
+![Codex](https://img.shields.io/badge/Codex-Supported-222222?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square)
+![License](https://img.shields.io/github/license/RyanZheng5588/skills-dashboard?style=flat-square)
 
-一个可安装的 Codex skill：读取本机 skill 目录，生成本地浏览器 dashboard，用于搜索、分类、查看详情和生成本地案例预览。
+> 🌏 English version: [README.en.md](./README.en.md)
 
-## Features
+一个适配 Codex / Claude Code / 本地 Agent 环境的 skill，用来扫描本机已安装的 skills，并生成一个可搜索、可分类、可查看详情与案例预览的本地浏览器 dashboard。
 
-- Scan common local roots: Codex, Claude, Hermes, agent skills, and Codex plugin caches.
-- Browse by platform: Codex, Claude, Hermes, and Other.
-- Browse by use case: copy, images, video, slides, layout, data, code, knowledge, automation, design, docs, audio, research, and more.
-- Fuzzy search across skill names, descriptions, usage notes, categories, platforms, and paths.
-- Card-based directory with pagination, ranking rail, and click-through detail drawer.
-- Bilingual UI: Chinese and English.
-- Theme switching: Orbit dark theme and Daylight light theme.
-- Local example previews that do not consume tokens or call external services.
-- Python standard library only for the dashboard builder.
+它解决的是「我到底装了哪些 skill、分别能干什么、应该什么时候用」这个问题。
 
-## Install
-
-Clone or download this project, then run:
+## 30 秒开始
 
 ```bash
-./scripts/install.sh
+npx skills add https://github.com/RyanZheng5588/skills-dashboard --skill skill-dashboard
 ```
 
-The installer copies `skill-dashboard/` into:
+也可以直接把下面这段话发给有 shell 权限的 AI Agent：
+
+```text
+帮我安装 skill-dashboard。请把 https://github.com/RyanZheng5588/skills-dashboard 克隆到 ~/.codex/skills/skill-dashboard，安装完成后检查 SKILL.md、assets/、references/、scripts/ 是否存在。
+```
+
+手动安装：
 
 ```bash
-${CODEX_HOME:-$HOME/.codex}/skills/skill-dashboard
+git clone https://github.com/RyanZheng5588/skills-dashboard.git ~/.codex/skills/skill-dashboard
 ```
 
-It excludes generated local output such as `.dashboard/`.
+已经安装过的话，更新：
 
-## Use
+```bash
+cd ~/.codex/skills/skill-dashboard
+git pull
+```
 
-After installation:
+## 使用
+
+安装后可以对 Codex 说：
+
+```text
+Use $skill-dashboard to open the local skill dashboard.
+```
+
+也可以直接运行：
 
 ```bash
 python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --open
 ```
 
-Serve over localhost:
+使用 localhost：
 
 ```bash
 python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --serve --open
 ```
 
-Add custom scan roots:
+添加自定义扫描目录：
 
 ```bash
 python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --root ~/my-skills --open
 ```
 
-Or:
+或：
 
 ```bash
 SKILL_DASHBOARD_ROOTS="$HOME/work/skills:$HOME/.custom/skills" \
   python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --open
 ```
 
-## Project Layout
+## 功能
+
+- 扫描常见本地 skill 根目录：Codex、Claude、Hermes、agent skills 和 Codex plugin cache。
+- 按平台浏览：Codex、Claude、Hermes、Other。
+- 按用途浏览：文案、图片、视频、PPT、排版、数据、代码、知识库、自动化、设计、文档、音频、研究等。
+- 支持对 skill 名称、描述、使用说明、分类、平台和路径进行模糊搜索。
+- 卡片式目录、分页、右侧用途榜单、详情抽屉。
+- 中英文 UI 切换。
+- Orbit 暗色主题与 Daylight 浅色主题。
+- 本地案例预览，不消耗 token，不调用外部服务。
+- 构建脚本只依赖 Python 标准库。
+
+## 适合 / 不适合
+
+**适合**：整理本机 skills / 查看 skill 用途 / 对比 Codex、Claude、Hermes skill / 给团队演示本地 skill 能力 / 开源 skill 仓库自查。
+
+**不适合**：云端托管多用户管理 / 远程同步 skill 市场 / 自动安装第三方 skill / 替代 Codex 自身 skill 调度。
+
+## 目录结构
 
 ```text
-skill-dashboard/
-  SKILL.md
-  agents/openai.yaml
-  assets/dashboard.html
-  references/classification.md
-  scripts/skill_dashboard.py
+SKILL.md
+agents/openai.yaml
+assets/dashboard.html
+references/classification.md
 scripts/
+  skill_dashboard.py
   install.sh
   check.sh
 ```
 
-## Development
+## 开发
 
-Run the local checks:
+本地检查：
 
 ```bash
 ./scripts/check.sh
 ```
 
-Build a dashboard from the repo copy without installing:
+不安装，直接从仓库构建预览：
 
 ```bash
-python3 skill-dashboard/scripts/skill_dashboard.py --out /tmp/skill-dashboard-preview --quiet
+python3 scripts/skill_dashboard.py --out /tmp/skill-dashboard-preview --quiet
 open /tmp/skill-dashboard-preview/index.html
 ```
 
-## Privacy
+安装当前工作区版本：
 
-This tool reads local `SKILL.md` files and writes a generated dashboard. The generated `.dashboard/` output may contain local file paths, skill names, and descriptions from your machine. It is intentionally ignored by git.
+```bash
+./scripts/install.sh
+```
 
-Do not commit generated dashboard output unless you have reviewed it and intentionally want to publish that data.
+## 隐私
+
+这个工具会读取本机的 `SKILL.md` 文件，并生成 `.dashboard/` 输出。生成结果可能包含本机路径、skill 名称和说明，因此 `.dashboard/` 默认被 `.gitignore` 排除。
+
+除非你已经审查过生成内容并明确想公开，否则不要提交 `.dashboard/`。
 
 ## License
 

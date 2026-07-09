@@ -2,11 +2,16 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SKILL_DIR="$ROOT_DIR/skill-dashboard"
+SKILL_DIR="$ROOT_DIR"
 OUT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/skill-dashboard-check.XXXXXX")"
 trap 'rm -rf "$OUT_DIR"' EXIT
 
-PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile "$SKILL_DIR/scripts/skill_dashboard.py"
+python3 - "$SKILL_DIR/scripts/skill_dashboard.py" "$OUT_DIR/skill_dashboard.pyc" <<'PY'
+import py_compile
+import sys
+
+py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)
+PY
 PYTHONDONTWRITEBYTECODE=1 python3 "$SKILL_DIR/scripts/skill_dashboard.py" --out "$OUT_DIR" --quiet
 
 python3 - "$OUT_DIR" <<'PY'

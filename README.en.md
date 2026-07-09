@@ -1,0 +1,123 @@
+# Skill Dashboard
+
+![Skill](https://img.shields.io/badge/Skill-Agent-111111?style=flat-square)
+![Codex](https://img.shields.io/badge/Codex-Supported-222222?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square)
+![License](https://img.shields.io/github/license/RyanZheng5588/skills-dashboard?style=flat-square)
+
+An installable skill for Codex, Claude Code, and local agent environments. It scans installed local skills and builds a self-contained browser dashboard for search, filtering, detail inspection, and local example previews.
+
+It answers a practical question: "What skills do I have installed, what can they do, and when should I use each one?"
+
+## Quick Start
+
+```bash
+npx skills add https://github.com/RyanZheng5588/skills-dashboard --skill skill-dashboard
+```
+
+Or ask a shell-capable AI agent:
+
+```text
+Install skill-dashboard. Clone https://github.com/RyanZheng5588/skills-dashboard into ~/.codex/skills/skill-dashboard, then verify that SKILL.md, assets/, references/, and scripts/ exist.
+```
+
+Manual install:
+
+```bash
+git clone https://github.com/RyanZheng5588/skills-dashboard.git ~/.codex/skills/skill-dashboard
+```
+
+Update:
+
+```bash
+cd ~/.codex/skills/skill-dashboard
+git pull
+```
+
+## Use
+
+After installation, ask Codex:
+
+```text
+Use $skill-dashboard to open the local skill dashboard.
+```
+
+Or run:
+
+```bash
+python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --open
+```
+
+Serve over localhost:
+
+```bash
+python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --serve --open
+```
+
+Add custom scan roots:
+
+```bash
+python3 ~/.codex/skills/skill-dashboard/scripts/skill_dashboard.py --root ~/my-skills --open
+```
+
+## Features
+
+- Scans common local roots: Codex, Claude, Hermes, agent skills, and Codex plugin caches.
+- Browse by platform: Codex, Claude, Hermes, and Other.
+- Browse by use case: copy, images, video, slides, layout, data, code, knowledge, automation, design, docs, audio, research, and more.
+- Fuzzy search across skill names, descriptions, usage notes, categories, platforms, and paths.
+- Card-based directory with pagination, ranking rail, and click-through detail drawer.
+- Bilingual UI: Chinese and English.
+- Theme switching: Orbit dark theme and Daylight light theme.
+- Local example previews that do not consume tokens or call external services.
+- Python standard library only for the dashboard builder.
+
+## Good Fit / Poor Fit
+
+**Good fit**: local skill inventory, skill discovery, comparing Codex/Claude/Hermes skills, team demos, open-source skill repo audits.
+
+**Poor fit**: cloud-hosted multi-user management, remote skill marketplace sync, automatic third-party skill installation, or replacing the agent's own skill routing.
+
+## Layout
+
+```text
+SKILL.md
+agents/openai.yaml
+assets/dashboard.html
+references/classification.md
+scripts/
+  skill_dashboard.py
+  install.sh
+  check.sh
+```
+
+## Development
+
+Run checks:
+
+```bash
+./scripts/check.sh
+```
+
+Build a preview without installing:
+
+```bash
+python3 scripts/skill_dashboard.py --out /tmp/skill-dashboard-preview --quiet
+open /tmp/skill-dashboard-preview/index.html
+```
+
+Install the working tree version:
+
+```bash
+./scripts/install.sh
+```
+
+## Privacy
+
+This tool reads local `SKILL.md` files and writes a generated `.dashboard/` output. That output may contain local paths, skill names, and descriptions. It is intentionally ignored by git.
+
+Do not commit `.dashboard/` unless you have reviewed it and intentionally want to publish that data.
+
+## License
+
+MIT

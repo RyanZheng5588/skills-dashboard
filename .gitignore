@@ -4,7 +4,6 @@ __pycache__/
 
 # Local generated dashboard output. It may contain local skill names, paths, and screenshots.
 .dashboard/
-skill-dashboard/.dashboard/
 
 # Local editor and runtime state.
 .vscode/
